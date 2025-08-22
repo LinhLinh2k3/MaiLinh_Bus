@@ -1,0 +1,125 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.KhuyenMaiViewModel
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+<div class="container my-5" style="max-width: 700px;">
+    <h2 class="mb-4 text-center" style="font-size: 20px;">Chi tiết khuyến mãi</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="card m-b-30">
+        <div class="card-body py-5">
+            <form id="khuyenMaiForm" asp-area="Admin" asp-action="Edit" method="post" class="container">
+                @Html.AntiForgeryToken()
+
+                <!-- Mã khuyến mãi -->
+                <div class="form-group row align-items-center">
+                    <label for="KhuyenMaiID" class="col-sm-4 col-form-label">Mã khuyến mãi:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="KhuyenMaiID" name="KhuyenMaiID" value="@Model.KhuyenMaiID" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Tên khuyến mãi -->
+                <div class="form-group row align-items-center">
+                    <label for="TenKhuyenMai" class="col-sm-4 col-form-label">Tên khuyến mãi:</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="TenKhuyenMai" name="TenKhuyenMai" value="@Model.TenKhuyenMai" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Loại khuyến mãi -->
+                <div class="form-group row align-items-center">
+                    <label for="LoaiKhuyenMai" class="col-sm-4 col-form-label">Loại khuyến mãi:</label>
+                    <div class="col-sm-8">
+                        <select id="LoaiKhuyenMai" name="LoaiKhuyenMai" class="form-control" disabled>
+                            <option value="Phần trăm" @(Model.LoaiKhuyenMai == "Phần trăm" ? "selected" : "")>Phần trăm</option>
+                            <option value="Cố định" @(Model.LoaiKhuyenMai == "Cố định" ? "selected" : "")>Cố định</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Ngày bắt đầu -->
+                <div class="form-group row align-items-center">
+                    <label for="NgayBatDau" class="col-sm-4 col-form-label">Ngày bắt đầu:</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="NgayBatDau" name="NgayBatDau" value="@Model.NgayBatDau.ToString("yyyy-MM-dd")" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Ngày kết thúc -->
+                <div class="form-group row align-items-center">
+                    <label for="NgayKetThuc" class="col-sm-4 col-form-label">Ngày kết thúc:</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="NgayKetThuc" name="NgayKetThuc" value="@Model.NgayKetThuc.ToString("yyyy-MM-dd")" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Giá trị giảm -->
+                <div class="form-group row align-items-center">
+                    <label for="GiaTriGiam" class="col-sm-4 col-form-label">Giá trị giảm:</label>
+                    <div class="col-sm-8">
+                        <input type="number" id="GiaTriGiam" name="GiaTriGiam" value="@Model.GiaTriGiam" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Điều kiện áp dụng -->
+                <div class="form-group row align-items-center">
+                    <label for="DieuKienApDung" class="col-sm-4 col-form-label">Điều kiện áp dụng:</label>
+                    <div class="col-sm-8">
+                        <input type="number" id="DieuKienApDung" name="DieuKienApDung" value="@Model.DieuKienApDung" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Trạng thái thanh toán -->
+                @* <div class="form-group row align-items-center">
+                    <label for="TrangThaiThanhToan" class="col-sm-4 col-form-label">Trạng thái thanh toán:</label>
+                    <div class="col-sm-8">
+                        <select id="TrangThaiThanhToan" name="TrangThaiThanhToan" class="form-control" disabled>
+                            <option value="Kích hoạt" @(Model.TrangThaiThanhToan == "Kích hoạt" ? "selected" : "")>Kích hoạt</option>
+                            <option value="Không kích hoạt" @(Model.TrangThaiThanhToan == "Không kích hoạt" ? "selected" : "")>Không kích hoạt</option>
+                        </select>
+                    </div>
+                </div> *@
+                <div class="form-group row align-items-center">
+                    <label for="TrangThaiThanhToan" class="col-sm-4 col-form-label">Trạng thái thanh toán:</label>
+                    <div class="col-sm-8">
+                        <select id="TrangThaiThanhToan" name="TrangThaiThanhToan" class="form-control" disabled>
+                            <option value="1" @(Model.TrangThaiThanhToan == "Đang sử dụng" ? "selected" : "")>Đang sử dụng</option>
+                            <option value="0" @(Model.TrangThaiThanhToan == "Không sử dụng" ? "selected" : "")>Không sử dụng</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="text-center">
+                    <button type="button" id="editButton" class="btn btn-primary">Sửa thông tin</button>
+                    <button type="submit" id="saveButton" class="btn btn-success" style="display: none;">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        document.getElementById("editButton").addEventListener("click", function () {
+            // Bỏ readonly hoặc disabled cho các trường cần chỉnh sửa
+            const inputs = document.querySelectorAll("#khuyenMaiForm input, #khuyenMaiForm select");
+            inputs.forEach(input => {
+                if (input.id !== "KhuyenMaiID") { // Giữ readonly cho ID
+                    input.removeAttribute("readonly");
+                    input.removeAttribute("disabled");
+                }
+            });
+            document.getElementById("editButton").style.display = "none";
+            document.getElementById("saveButton").style.display = "inline-block";
+        });
+    </script>
+}

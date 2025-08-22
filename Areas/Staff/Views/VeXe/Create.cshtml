@@ -1,0 +1,496 @@
+﻿@model NhaXeMaiLinh.Areas.Staff.Models.VeModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+@section Style {
+    <style>
+        .legend {
+            width: 20px;
+            height: 14px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .selected {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .selected:hover {
+            background-color: #ffca2c;
+            border-color: #ffca2c;
+        }
+    </style>
+}
+
+<h1>Tạo mới</h1>
+<h4>Vé xe</h4>
+<div class="row">
+    <div class="offset-xl-3 col-xl-6 col-12">
+        <form asp-action="Create" id="createTicket">
+            <div class="card mb-4">
+                <div class="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%; transition: width 0.6s ease;"></div>
+                </div>
+                <!-- card body -->
+                <div class="card-body">
+                    <!-- Thông tin cơ bản -->
+                    <div class="row gx-3" id="step">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Thông tin cơ bản</h1>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="searchKhachHang" class="control-label">Khách hàng <span class="text-danger">*</span></label>
+                            <input type="text" id="searchKhachHang" class="form-control" placeholder="Tìm kiếm hành khách bằng họ tên, sdt, hoặc cccd" />
+                            <input type="hidden" asp-for="KhachHangID" />
+                            <!-- Kết quả tìm kiém -->
+                            <div id="loadingSpinner" class="d-none my-5 align-items-center justify-content-centerr">
+                                <div class="spinner-border text-primary" aria-hidden="true" role="status"></div>
+                                <span class="ms-2 fw-bold">Đang tải...</span>
+                            </div>
+                            <div id="ketquaKhachHang" class="d-none mt-3"></div>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="searchLichTrinh" class="control-label">Lịch trình <span class="text-danger">*</span></label>
+                            <input type="text" id="searchLichTrinh" class="form-control" placeholder="Tìm kiếm lịch trình" />
+                            <input type="hidden" asp-for="LichTrinhID" />
+                            <!-- Kết quả tìm kiém -->
+                            <div id="loadingSpinner2" class="d-none my-5 align-items-center justify-content-centerr">
+                                <div class="spinner-border text-primary" aria-hidden="true" role="status"></div>
+                                <span class="ms-2 fw-bold">Đang tải...</span>
+                            </div>
+                            <div id="ketquaLichTrinh" class="d-none mt-3"></div>
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary" id="next-btn" disabled onclick="finishStep1()">Sau</button>
+                        </div>
+                    </div>
+
+                    <!-- Chọn ghế -->
+                    <div class="d-none row gx-3" id="step">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Chọn ghế</h1>
+                        </div>
+                        <div class="d-none d-flex flex-column justify-content-center mb-4" id="none">
+                            <img src="~/images/error.png" class="img-fluid d-block mx-auto" style="max-width: 100px; max-height: 100%" />
+                            <p class="text-center fw-bold text-danger mt-2 fs-3">Không có vé!</p>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center mb-4" id="seatContainer">
+                            <div class="d-none" id="tang-tren">
+                                <h2 class="h6">Tầng trên</h2>
+                                <div class="d-block text-center seat-row"></div>
+                            </div>
+                            
+                            <div class="d-none my-4" id="tang-duoi">
+                                <h2 class="h6">Tầng dưới</h2>
+                                <div class="d-block text-center seat-row"></div>
+                            </div>
+
+                            <div class="d-none" id="bth">
+                                <div class="d-block text-center seat-row"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center my-3" id="containerFooter">
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend text-bg-secondary"></div>
+                                <span>Còn trống</span>
+                            </div>
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend text-bg-danger"></div>
+                                <span>Đã bán</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="legend text-bg-warning"></div>
+                                <span>Đang chọn</span>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep()">Trước</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn-2" onclick="nextStep()" disabled>Sau</button>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin thanh toán -->
+                    <div class="d-none row gx-3" id="step">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Thông tin thanh toán</h1>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="GiaVe" class="control-label">Tổng tiền vé</label>
+                            <input type="text" id="GiaVe" class="form-control" disabled readonly />
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label asp-for="KhuyenMaiID" class="control-label">Khuyến mãi <span class="text-danger">*</span></label>
+                            <select asp-for="KhuyenMaiID" class="form-select" asp-items="ViewBag.KhuyenMaiID"></select>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <input type="hidden" asp-for="TongGiaVe" />
+                            <label for="TongTien" class="control-label">Thành tiền</label>
+                            <input type="text" id="TongTien" class="form-control" disabled readonly />
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep()">Trước</button>
+                            <button type="submit" class="btn btn-primary">Tạo</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Index">Trở về danh sách</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let selectedSeats = [];
+        let currentStep = 0;
+        let discountValue = 0;
+        const steps = document.querySelectorAll('#step');
+        const progressBar = document.getElementById('progressBar');
+
+        function showStep(step) {
+            steps.forEach((s, index) => {
+                s.classList.toggle('d-none', index !== step);
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+                updateProgressBar();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                updateProgressBar();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentStep / steps.length) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+
+        function formatDate(date) {
+            let [year, month, day] = date.split("-");
+            return `${day}/${month}/${year}`;
+        }
+
+        function autoFill() {
+            var itemId = $('#LichTrinhID').val();
+            if (itemId) {
+                $.ajax({
+                    url: '/thong-tin/lich-trinh/ghe?id=' + itemId,
+                    method: 'GET',
+                    success: function(data) {
+                        displaySeats(data);
+                    }
+                });
+            }
+        }
+
+        function formatVND(number) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                .format(number)
+                .replace('₫', ' đ'); // Replace the default "₫" with " đ"
+        }
+
+        function giaTien() {
+            var itemId = $('#LichTrinhID').val();
+            if (itemId) {
+                $.ajax({
+                    url: '/thong-tin/lich-trinh/tien?id=' + itemId,
+                    method: 'GET',
+                    success: function(data) {
+                        const price = parseFloat(data);
+                        const totalPrice = price * selectedSeats.length;
+                        const discountedPrice = totalPrice - (totalPrice * discountValue / 100);
+                        const roundedPrice = Math.round(discountedPrice / 1000) * 1000;
+                        $('#TongGiaVe').val(roundedPrice);
+                        $('#TongTien').val(formatVND(roundedPrice));
+                        $('#GiaVe').val(formatVND(roundedPrice));
+                    }
+                });
+            }
+        }
+
+        function discountAmount() {
+            var itemId = $('#KhuyenMaiID').val();
+            if (itemId) {
+                $.ajax({
+                    url: '/thong-tin/lich-trinh/giam-gia?id=' + itemId,
+                    method: 'GET',
+                    success: function(data) {
+                        discountValue = parseInt(data);
+                    }
+                });
+            }
+        }
+
+        // Ép người dùng phải chọn (Form thông tin)
+        function validateSelects() {
+            const select1 = $('#KhachHangID').val();
+            const select2 = $('#LichTrinhID').val();
+            const isValid = select1 !== null && select1 !== '' && select2 !== null && select2 !== '';
+            $('#next-btn').prop('disabled', !isValid);
+        }
+
+        function displaySeats(param) {
+            if (param == null || param.length == 0) {
+                $('#none').removeClass('d-none');
+                $('#seatContainer').removeClass('d-flex').addClass('d-none');
+                $('#containerFooter').addClass('d-none');
+            } else {
+                $('#none').addClass('d-none');
+                $('#seatContainer').addClass('d-flex').removeClass('d-none');
+                $('#containerFooter').removeClass('d-none');
+            }
+
+            // Reset lại hiển thị
+            $('#seatContainer #tang-tren .seat-row').empty();
+            $('#seatContainer #tang-duoi .seat-row').empty();
+            $('#seatContainer #bth .seat-row').empty();
+
+            param.forEach(data => {
+                // Đáng lẽ nên sài .includes() nhưng mà đã cấu hình cho phép xuất tiếng Việt ra json nên so sánh được lun
+                const buttonClass = data.trangThai == "mua" ? 'btn-danger' : 'btn-secondary';
+                const button = $('<button type="button"></button>')
+                    .addClass(`btn ${buttonClass} m-2 col-3 seat`)
+                    .text(data.tenGhe)
+                    .attr('data-gheid', data.gheID)
+                    .on('click', function() {
+                        // Thêm class 'selected' cho nút được bấm
+                        $(this).toggleClass('selected');
+
+                        const seatID = $(this).attr('data-gheid');
+                        if ($(this).hasClass('selected')) {
+                            // Thêm ghế (nút được bấm) vào mảng
+                            selectedSeats.push(seatID);
+                        } else {
+                            // Xóa ghế (nút được bấm) ra khỏi mảng
+                            selectedSeats = selectedSeats.filter(id => id !== seatID);
+                        }
+
+                        checkSelection();
+                    });
+
+                // Hiển thị màu theo trạng thái ghế
+                if (data.trangThai == "mua") button.prop('disabled', true);
+
+                const loaixe = data.xe.loaiXeId;
+                if (loaixe === 'LX001' || loaixe === 'LX003') {
+                    // Cho hiển thị ghế
+                    $('#tang-tren').removeClass('d-none');
+                    $('#tang-duoi').removeClass('d-none');
+                    if (!$('#bth').hasClass('d-none')) $('#bth').addClass('d-none');
+
+                    // Thay đổi chỗ hiện ghế
+                    if (data.tenGhe.charAt(0) === 'B') {
+                        const khuTangTren = $('#seatContainer #tang-tren .seat-row');
+                        khuTangTren.append(button);
+                    } else if (data.tenGhe.charAt(0) === 'A') {
+                        const khuTangDuoi = $('#seatContainer #tang-duoi .seat-row');
+                        khuTangDuoi.append(button);
+                    }                    
+                } else if (loaixe === 'LX002') {
+                    $('#bth').removeClass('d-none');
+                    if (!$('#tang-tren').hasClass('d-none')) $('#tang-tren').addClass('d-none');
+                    if (!$('#tang-duoi').hasClass('d-none')) $('#tang-duoi').addClass('d-none');
+
+                    const khuGhe = $('#seatContainer #bth .seat-row');
+                    khuGhe.append(button);
+                }
+            });
+        }
+
+        // Ít nhất một cái ghế phải được chọn
+        function checkSelection() {
+            if ($('.seat.selected').length > 0) {
+                $('#nextBtn-2').prop('disabled', false);
+            } else {
+                $('#nextBtn-2').prop('disabled', true);
+            }
+
+            giaTien();
+        }
+
+        // Nạp danh sách ghế để đẩy về backend
+        function addHiddenInputs() {
+            $('#createTicket').find('input[name="dsGhe[]"]').remove(); // Xóa hết trước đó
+            selectedSeats.forEach(seatID => {
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'dsGhe[]',
+                    value: seatID
+                }).appendTo('#createTicket');
+            });
+        }
+
+        function fetchKhachHang(query = "") {
+            $('#loadingSpinner').toggleClass("d-none").toggleClass("d-flex");
+
+            $.ajax({
+                url: '/thong-tin/khach-hang/',
+                type: 'GET',
+                data: { query: query },
+                success: function(response) {
+                    $('#loadingSpinner').toggleClass("d-none").toggleClass("d-flex");
+
+                    $('#ketquaKhachHang').empty();
+
+                    if (response != null && response.length > 0) {
+                        const list = $("<ul class='list-group'>");
+                        response.forEach(data => {
+                            const listItem = $(`
+                                <li class='list-group-item d-flex justify-content-between align-items-start'>
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">${data.hoTen}</div>
+                                        <p class="mb-0">SDT: <span class="fst-italic">${data.sdt}</span> - CCCD: <span class="fst-italic">${data.cccd}</span></p>
+                                    </div>
+                                    <span class="badge text-bg-primary rounded-pill">${data.hangThanhVien}</span>
+                                </li>`)
+                                .css("cursor", "pointer")
+                                .on("click", function () {
+                                    $('#KhachHangID').val(data.khachHangID);
+                                    $('#searchKhachHang').val(data.hoTen);
+
+                                    $('#ketquaKhachHang').addClass("d-none").removeClass("d-block");
+                                    $('#ketquaKhachHang').empty();
+
+                                    validateSelects();
+                                });
+                            list.append(listItem);
+                        });
+
+                        $('#ketquaKhachHang').removeClass("d-none").addClass("d-block");
+                        $('#ketquaKhachHang').append(list);
+                    } else {
+                        if ($('#searchKhachHang').val().trim() === '') {
+                            $('#ketquaKhachHang').addClass("d-none").removeClass("d-block");
+                            $('#ketquaKhachHang').empty();
+
+                            $('#KhachHangID').val('');
+                            
+                            validateSelects();
+                            return;
+                        }
+
+                        $('#ketquaKhachHang').removeClass("d-none").addClass("d-block");
+                        $('#ketquaKhachHang').append("<p class='text-muted'>Không tìm thấy</p>");
+                    }
+                },
+                error: function () {
+                    $('#loadingSpinner').toggleClass("d-none").toggleClass("d-flex");
+                    alert("Có lỗi xảy ra khi tìm kiếm thông tin");
+                }
+            });
+        }
+
+        function fetchLichTrinh(query = "") {
+            $('#loadingSpinner2').toggleClass("d-none").toggleClass("d-flex");
+
+            $.ajax({
+                url: '/thong-tin/lich-trinh/query/',
+                type: 'GET',
+                data: { query: query },
+                success: function(response) {
+                    $('#loadingSpinner2').toggleClass("d-none").toggleClass("flex");
+
+                    $('#ketquaLichTrinh').empty();
+
+                    if (response != null && response.length > 0) {
+                        const list = $("<ul class='list-group'>");
+                        response.forEach(data => {
+                            const listItem = $(`
+                                <li class='list-group-item d-flex justify-content-between align-items-start'>
+                                    <div class="ms-2 me-auto">
+                                                <div class="fw-bold">${data.tuyenDuong.diemDi} - ${data.tuyenDuong.diemDen}  </div>
+                                        <p class="mb-0">${data.gioKhoiHanh.substring(0, 5)} ${formatDate(data.ngayKhoiHanh)} - ${data.gioDen.substring(0, 5)} ${formatDate(data.ngayDen)}</p>
+                                    </div>
+                                </li>`)
+                                .css("cursor", "pointer")
+                                .on("click", function () {
+                                    $('#LichTrinhID').val(data.lichTrinhId);
+                                    $('#searchLichTrinh').val(data.tuyenDuong.tenTuyenDuong);
+
+                                    $('#ketquaLichTrinh').addClass("d-none").removeClass("d-block");
+                                    $('#ketquaLichTrinh').empty();
+
+                                    validateSelects();
+                                });
+                            list.append(listItem);
+                        });
+
+                        $('#ketquaLichTrinh').removeClass("d-none").addClass("d-block");
+                        $('#ketquaLichTrinh').append(list);
+                    } else {
+                        if ($('#searchLichTrinh').val().trim() === '') {
+                            $('#ketquaLichTrinh').addClass("d-none").removeClass("d-block");
+                            $('#ketquaLichTrinh').empty();
+
+                            $('#LichTrinhID').val('');
+
+                            validateSelects();
+                            return;
+                        }
+
+                        $('#ketquaLichTrinh').removeClass("d-none").addClass("d-block");
+                        $('#ketquaLichTrinh').append("<p class='text-muted'>Không tìm thấy</p>");
+                    }
+                },
+                error: function () {
+                    $('#loadingSpinner2').toggleClass("d-none").toggleClass("flex");
+                    alert("Có lỗi xảy ra khi tìm kiếm thông tin");
+                }
+            });
+        }
+
+        function finishStep1() {
+            autoFill();
+            nextStep();
+        }
+
+        $(document).ready(function() {
+            // Cấu hình thanh tiến trình
+            showStep(currentStep);
+
+            // Dành cho bước 1
+            $('#searchKhachHang').on("input", function () {
+                const searchQuery = $(this).val();
+                fetchKhachHang(searchQuery);
+            });
+
+            $('#searchLichTrinh').on("input", function () {
+                const searchQuery = $(this).val();
+                fetchLichTrinh(searchQuery);
+            });
+
+            // Dành cho bước 2
+            checkSelection();
+
+            // Bước cuối
+            $('#createTicket').on('submit', function () {
+                progressBar.style.width = '100%';
+                progressBar.setAttribute('aria-valuenow', 100);
+
+                addHiddenInputs();
+            });
+        });
+    </script>
+}

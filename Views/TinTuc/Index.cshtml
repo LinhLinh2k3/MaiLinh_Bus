@@ -1,0 +1,146 @@
+﻿@using NhaXeMaiLinh.Services
+@model List<NhaXeMaiLinh.Models.Data.TinTuc>
+
+@{
+    ViewData["Title"] = "Bài viết";
+    ViewData["tin-tuc"] = "active";
+}
+
+<!--Blog list start-->
+<div class="blog-section">
+    <div class="container">
+        <div class="row">
+            @if (Model.Count == 0)
+            {
+                <h3 style="text-align:center">Khong co du lieu</h3>
+
+            }
+            else
+            {
+                @foreach (var tintuc in Model)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 mb-5">
+                        <div class="post-entry">
+                            <a class="post-thumbnail" asp-controller="TinTuc" asp-action="ChiTiet" asp-route-url="@tintuc.Url">
+                                <img src="@Url.Content("~/" + tintuc.AnhBia)" alt="Image" class="img-fluid">
+                            </a>
+                            <div class="post-content-entry">
+                                <h3><a href="#">@tintuc.TieuDe</a></h3>
+                                <div class="meta">
+                                    <span>by <a href="#">@tintuc.NhanVien.HoTen</a></span> <span>on <a href="#">@tintuc.ThoiGian</a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @* <nav id="Phan-Trang" aria-label="Page navigation example">
+					<ul class="pagination justify-content-center">
+						<li class="page-item disabled">
+							<a class="page-link" href="#">-</a>
+						</li>
+						<li class="page-item"><a class="page-link" href="#">1</a></li>
+						<li class="page-item"><a class="page-link" href="#">2</a></li>
+						<li class="page-item"><a class="page-link" href="#">3</a></li>
+						<li class="page-item">
+							<a class="page-link" href="#">+</a>
+						</li>
+					</ul>
+				</nav> *@
+            }
+
+        </div>
+    </div>
+</div>
+@* <section class="mb-xl-9 my-4">
+    <div class="container">
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="row">
+                <div class="col-12">
+                    @foreach (var tintuc in Model)
+                    {
+                        <article class="row d-flex align-items-center mb-7 mb-md-5">
+                            <div class="col-lg-5 col-xl-5 col-md-12 col-12">
+                                <figure class="mb-4 mb-lg-0 zoom-img">
+                                    <a href="@Url.Content("/staff/tin-tuc/xem/"+ tintuc.Url)">
+                                        <img src="@Url.Content("~/" + tintuc.AnhBia)" alt="@tintuc.TieuDe" class="img-fluid rounded-3">
+                                    </a>
+                                </figure>
+                            </div>
+                            <div class="col-lg-7 col-xl-7 col-md-12 col-12">
+                                <div class="ms-lg-4">
+                                    <a href="#!" class="mb-3 badge bg-primary-subtle text-primary-emphasis rounded-pill text-uppercase">Digital</a>
+                                    <div class="mb-4">
+                                        <h3 class="lh-base h4">
+                                            <a href="@Url.Content("/staff/tin-tuc/xem/"+ tintuc.Url)" class="text-reset">
+                                                @tintuc.TieuDe
+                                            </a>
+                                        </h3>
+                                        <p class="col-10 text-truncate">@FileManager.StripHtmlTags(tintuc.NoiDung)</p>
+                                    </div>
+                                    <div class="d-md-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                                            <div class="d-flex align-items-center">
+                                                <img src="@Url.Content("~/images/person.jpg")" alt="@tintuc.NhanVien.HoTen" class="avatar avatar-xs rounded-circle">
+                                                <div class="ms-2">
+                                                    <a href="#" class="text-reset fs-6">@tintuc.NhanVien.HoTen</a>
+                                                </div>
+                                            </div>
+                                            <div class="ms-3"><span class="fs-6">@tintuc.ThoiGian</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+                <div class="col-lg-12">
+                    @if (ViewBag.TotalPages > 0)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                @if (ViewBag.CurrentPage > 1)
+                                {
+                                    <li class="page-item mx-1 @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { trang = ViewBag.CurrentPage - 1 })" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                            <span class="sr-only">Trước</span>
+                                        </a>
+                                    </li>
+                                }
+
+                                @{
+                                    var startPage = Math.Max(ViewBag.CurrentPage - 2, 1);
+                                    var endPage = Math.Min(startPage + 4, ViewBag.TotalPages);
+                                    startPage = Math.Max(endPage - 4, 1);
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item mx-1 @(ViewBag.CurrentPage == i ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { trang = i })">@i</a>
+                                    </li>
+                                }
+
+                                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                {
+                                    <li class="page-item mx-1 @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { trang = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                            <span class="sr-only">Sau</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>Không có tin tức!</p>
+        }
+    </div>
+</section> *@
+<!--Blog list end-->

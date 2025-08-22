@@ -1,0 +1,81 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.TuyenDuongViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        span {
+            z-index: 5;
+        }
+
+        .text-danger {
+            color: red;
+            display: block;
+        }
+    </style>
+}
+
+<h2 class="mb-4 text-center" style="font-size: 20px;">Thêm tuyến đường</h2>
+<form action="/admin/them-tuyen-duong" method="post">
+    @Html.AntiForgeryToken()
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="text-success" style="font-size: 16px;">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="form-group">
+        <label asp-for="TenTuyenDuong">Tên tuyến đường</label>
+        <input type="text" id="TenTuyenDuong" name="TenTuyenDuong" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.TenTuyenDuong)</span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiemDi">Điểm đi</label>
+        <select id="DiemDi" name="DiemDi" class="form-control">
+            <option value="">-- Chọn tỉnh/thành phố --</option>
+        </select>
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.DiemDi)</span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiemDen">Điểm đến</label>
+        <select id="DiemDen" name="DiemDen" class="form-control">
+            <option value="">-- Chọn tỉnh/thành phố --</option>
+        </select>
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.DiemDen)</span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuangDuong">Quãng đường</label>
+        <input type="text" id="QuangDuong" name="QuangDuong" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.QuangDuong)</span>
+    </div>
+
+    <div class="form-group text-center mt-3">
+        <button type="submit" class="btn btn-primary">Tạo Tuyến Đường</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const apiUrl = "https://provinces.open-api.vn/api/";
+
+            axios.get(apiUrl)
+                .then(response => {
+                    const provinces = response.data;
+                    let options = '<option value="">-- Chọn tỉnh/thành phố --</option>';
+                    provinces.forEach(province => {
+                        options += `<option value="${province.name}">${province.name}</option>`;
+                    });
+
+                    document.getElementById("DiemDi").innerHTML = options;
+                    document.getElementById("DiemDen").innerHTML = options;
+                })
+                .catch(error => {
+                    console.error("Lỗi khi tải dữ liệu tỉnh thành:", error);
+                });
+        });
+    </script>
+}

@@ -1,0 +1,340 @@
+﻿@model NhaXeMaiLinh.Areas.Staff.Models.ThemTinTuc;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = " Thêm Bài viết";
+    Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+@section Style {
+    <link rel="stylesheet" href="~/lib/quill/quill.snow.min.css" />
+    <link rel="stylesheet" href="~/lib/dropzone/dropzone.min.css" />
+    <style>
+        .dropzone {
+            border: var(--gk-border-width) solid var(--gk-border-color);
+            border-radius: var(--gk-border-radius);
+        }
+
+        img[src="#"] {
+            display: none;
+        }
+
+        .img-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .ql-container {
+            font-size: 13px;
+            height: 100%;
+            margin: 0;
+            position: relative;
+        }
+
+        .ql-container.ql-snow {
+            border: 0;
+        }
+
+        .ql-toolbar.ql-snow {
+            border: 0;
+            box-sizing: border-box;
+            padding: 8px;
+            font-family: var(--gk-body-font-family);
+        }
+
+        .ql-toolbar.ql-snow + .ql-container.ql-snow {
+            border-top: var(--gk-border-width) solid var(--gk-border-color)
+        }
+
+        .ql-editor {
+            box-sizing: border-box;
+            counter-reset: list-0 list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+            line-height: 1.42;
+            height: 100%;
+            outline: 0;
+            overflow-y: auto;
+            padding: 12px 15px;
+            tab-size: 4;
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
+            border-color: transparent;
+        }
+
+        .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+            border-radius: .475rem
+        }
+
+        .ql-snow .ql-picker.ql-expanded .ql-picker-options {
+            display: block;
+            margin-top: 2px;
+            top: 100%;
+            z-index: 1;
+        }
+
+        .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+            margin-left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .ql-snow .ql-color-picker .ql-picker-label, .ql-snow .ql-icon-picker .ql-picker-label {
+            padding: 1px 5px 11px 0px;
+        }
+
+        .ql-editor.error {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23db1436'%3E%3Ccircle cx='6' cy='6' r='4.5'/%3E%3Cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3E%3Ccircle cx='6' cy='8.2' r='.6' fill='%23db1436' stroke='none'/%3E%3C/svg%3E");
+            background-position: right calc(.375em + .25rem) center;
+            background-repeat: no-repeat;
+            background-size: calc(.75em + .5rem) calc(.75em + .5rem);
+            padding-right: calc(1.5em + 1rem)
+        }
+
+        .ql-editor.success {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23008008' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E");
+            background-position: right calc(.375em + .25rem) center;
+            background-repeat: no-repeat;
+            background-size: calc(.75em + .5rem) calc(.75em + .5rem);
+            padding-right: calc(1.5em + 1rem);
+        }
+
+        /* The Modal (background) */
+        .modal {
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Blur background */
+        }
+
+        .modal-dialog {
+            width: 200px;
+        }
+
+        .modal-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .loading-gif {
+            width: 80px;
+            height: 80px;
+        }
+    </style>
+}
+
+<!-- Pageheader start -->
+<section class="py-5 py-lg-8">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-12">
+                <h1 class="mb-3 text-center">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Pageheader end -->
+<!-- Article start -->
+<div class="py-xl-2 mb-8">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card shadow-sm col-lg-8 offset-lg-2">
+                <div class="card-body">
+                    <form class="row g-3 needs-validation" id="createArticle" method="post" asp-action="Them" enctype="multipart/form-data" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div class="col-md-12">
+                            <label for="TieuDe" class="form-control-label">
+                                Tiêu đề <span class="text-danger">*</span>
+                            </label>
+                            <input name="TieuDe" id="TieuDe" class="form-control" required />
+                        </div>
+                        <div class="col-md-12">
+                            <label for="NoiDung" class="control-label">
+                                Nội dung <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group border border-1 rounded-3">
+                                <div class="col-12 editor"></div>
+                                <input type="hidden" name="NoiDung" id="NoiDung" required />
+                            </div>
+                        </div>
+                        <div class="col-md-12" id="frame">
+                            <label for="AnhBia" class="control-label">
+                                Ảnh bìa <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex justify-content-center align-items-center overflow-hidden rounded-3" id="space">
+                                <img id="upload" src="#" class="img-cover" />
+                            </div>
+                            <input name="AnhBia" id="AnhBia" type="file" class="form-control" required accept="image/jpeg, image/png, image/gif" onchange="readURL(this)" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="control-label">Tệp tin</label>
+                            <div id="filesDropzone" class="dropzone"></div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Đăng bài</button>
+                            <a class="fw-bold mt-2 text-center" href="/staff/tin-tuc/quan-ly"><i class="bi bi-arrow-left"></i> Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Article end -->
+<!-- The Modal -->
+<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal body -->
+            <div class="modal-body">
+                <img src="https://i.gifer.com/ZKZx.gif" alt="Loading..." class="loading-gif">
+                <h4 class="mt-2">Đang tải lên...</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lib -->
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/quill/quill.min.js"></script>
+    <script src="~/lib/dropzone/dropzone.min.js"></script>
+    <script>
+        function readURL(input) {
+            if (input.files) {
+                var files = input.files;
+                for (var i = 0; i < files.length; i++) {
+                    if (files[i].type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            $('#upload').attr('src', e.target.result);
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                        break;
+                    }
+                };
+            }
+        }
+
+        var editor = new Quill(".editor", {
+            modules: {
+                toolbar: [[{
+                    header: [1, 2, !1]
+                }], [{
+                    font: []
+                }], ["bold", "italic", "underline", "strike"], [{
+                    size: ["small", !1, "large", "huge"]
+                }], [{
+                    list: "ordered"
+                }, {
+                    list: "bullet"
+                }], [{
+                    color: []
+                }, {
+                    background: []
+                }, {
+                    align: []
+                }]]
+            },
+            theme: "snow"
+        });
+
+        // Update data realtime as user input content!
+        editor.on('text-change', () => {
+            $("#NoiDung").val(editor.root.innerHTML.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>|<script\s+src=["'][^"']*["']><\/script>/gi, '')); // Remove tag <script> for security;
+        });
+
+        // Check validate
+        editor.on('editor-change', () => {
+            if ($("div.ql-editor").hasClass("error") && $("#NoiDung").val() !== null) {
+                $("div.input-group").removeClass("border-danger").addClass("border-success");
+                $("div.ql-editor").removeClass("error").addClass("success");
+            }
+
+            if ($("div.ql-editor").hasClass("success") && $("div.ql-editor").hasClass("ql-blank")) {
+                $("div.input-group").removeClass("border-success").addClass("border-danger");
+                $("div.ql-editor").removeClass("success").addClass("error");
+            }
+        });
+
+        // Preview cover
+        $("input#AnhBia").change(function() {
+            $("img#upload").on("load", function() {
+                $("#space").addClass("mb-2");
+                $("#frame").css("height", "300px");
+                $("#space").css("height", "80%");
+            }).on("error", function() {
+                $("#space").removeClass("mb-2");
+                $("#frame").removeAttr("style");
+                $("#space").removeAttr("style");
+            });
+        });
+
+        // Article's files
+        const dropzone = new Dropzone("div#filesDropzone", {
+            url: "/staff/tin-tuc/them",
+            method: "post",
+            paramName: "file", // The name that will be used to transfer the file
+            uploadMultiple: true,
+            parallelUploads: 5,
+            maxFiles: 10,
+            maxFilesize: 20, //Mb
+            acceptedFiles: ".jpg,.png,.gif,.doc,.docx,.pdf",
+            dictDefaultMessage: "Thả file tại đây hoặc nhấn vào để tải lên",
+            addRemoveLinks: true,
+            autoProcessQueue: false,
+            createImageThumbnails: true,
+            thumbnailMethod: "crop",
+            clickable: true,
+            autoQueue: true,
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            }
+        });
+
+        // Handle when submit the form (override)
+        const form = document.querySelector('#createArticle');
+        $("button#submitBtn").on('click', function(e) {
+            if (form.checkValidity() == false) {
+                // The content is not existed yet!
+                if (!$("#NoiDung").val() || !$("#NoiDung").hasClass("ql-blank")) {
+                    $("div.input-group").removeClass("border-success").addClass("border-danger");
+                    $("div.ql-editor").removeClass("success").addClass("error");
+                }
+            } else if (form.checkValidity() == true) {
+                $('#loadingModal').modal('show');
+                // If dropzone has files, processing the queue. If not, submit the form!
+                if (dropzone.getQueuedFiles().length > 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.processQueue();
+                } else {
+                    form.submit();
+                }
+            }
+        });
+
+        // Add each file into Array (Backend handle)
+        dropzone.on("sending", function(file, response, formData) {
+            formData.append("files", file);
+        });
+
+        // Add form data with dropzone's file (if files existed in dropzone)
+        dropzone.on("sendingmultiple", function(data, xhr, formData) {
+            formData.append("TieuDe", $("input[name=TieuDe]").val());
+            formData.append("NoiDung", $("input[name=NoiDung]").val().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>|<script\s+src=["'][^"']*["']><\/script>/gi, '')); // Remove tag <script> for security
+            formData.append("AnhBia", $("input[name=AnhBia]")[0].files[0]);
+        });
+
+        // Finish the queue and we're ready to go!
+        dropzone.on("successmultiple", function() {
+            window.location.href = "/staff/tin-tuc/quan-ly";
+        });
+    </script>
+}

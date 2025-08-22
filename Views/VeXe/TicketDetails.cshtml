@@ -1,0 +1,144 @@
+﻿@model NhaXeMaiLinh.Models.Data.VeXe
+@{
+    ViewData["Title"] = "Chi tiết vé";
+}
+@section Style {
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .ticket-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .header img {
+                width: 50px;
+            }
+
+            .header .company-info {
+                text-align: right;
+            }
+
+                .header .company-info h6 {
+                    margin: 0;
+                }
+
+        .boarding-pass {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+            .boarding-pass h5 {
+                color: red;
+                margin: 0;
+            }
+
+        .details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+            .details div {
+                width: 48%;
+            }
+
+                .details div h6 {
+                    margin: 0;
+                }
+
+                .details div p {
+                    margin: 0;
+                    font-weight: bold;
+                }
+
+        .footer {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+            .footer p {
+                margin: 0;
+            }
+
+            .footer .contact {
+                text-align: right;
+            }
+
+        .details h6 {
+            margin-top: 15px;
+        }
+    </style>
+}
+
+<div class="ticket-container">
+    <div class="header">
+        <div class="logo">
+            <img src="@Url.Content("~/"+"images/Picture1.png")" style="min-width: 300px; height: auto;" />
+            <h6 class="text-success"><strong>MAI LINH</strong></h6>
+            <p class="text-success">CHẤT LƯỢNG LÀ DANH DỰ</p>
+        </div>
+        <div class="company-info">
+            <h6>CÔNG TY CỔ PHẦN XE KHÁCH</h6>
+            <h6>MAI LINH</h6>
+        </div>
+    </div>
+
+    <div class="boarding-pass">
+        <h5>THÔNG TIN VÉ XE</h5>
+        <h5 class="font-weight-bold" style="color: black;">
+            <strong>@Model.LichTrinh.TuyenDuong.DiemDi ⇒ @Model.LichTrinh.TuyenDuong.DiemDen</strong>
+        </h5>
+        <p>XE/BUS: @Model.LichTrinh.Xe.BienSo</p>
+    </div>
+
+    <div class="details">
+        <div>
+            <h6>NƠI ĐI/ FROM:</h6>
+            <p>@Model.LichTrinh.TuyenDuong.DiemDi</p>
+            <h6>KHỞI HÀNH/ DEPARTURE TIME:</h6>
+            <p>@Model.LichTrinh.GioKhoiHanh</p>
+            <h6>KHỞI HÀNH/ DEPARTURE DATE:</h6>
+            <p>@Model.LichTrinh.NgayKhoiHanh.ToString("dd-MM-yyyy")</p>
+            <h6>GHẾ/ SEAT:</h6>
+            <p>
+                @foreach (var chiTiet in Model.ChiTietVeDats)
+
+                {
+                    @chiTiet.Ghe.TenGhe <br />
+                }
+            </p>
+            <h6>ĐIỆN THOẠI/ TEL:</h6>
+            <p>@Model.KhachHang.SDT</p>
+        </div>
+        <div>
+            <h6>NƠI ĐẾN/ TO:</h6>
+            <p>@Model.LichTrinh.TuyenDuong.DiemDen</p>
+            <h6>MÃ VÉ/ CODE:</h6>
+            <p>@Model.VeID</p>
+            <h6>GIÁ VÉ/ PRICE:</h6>
+            <p>@Model.TongGiaVe.ToString("#,##0") VNĐ</p>
+            <h6>HỌ TÊN/ NAME:</h6>
+            <p>@Model.KhachHang.HoTen</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="contact">
+            <p class="text-danger">TỔNG ĐÀI/ CONTACT CENTER:</p>
+            <p class="text-danger">1900 6067</p>
+        </div>
+    </div>
+</div>

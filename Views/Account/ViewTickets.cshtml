@@ -1,0 +1,72 @@
+﻿@using System.Globalization
+@model IEnumerable<NhaXeMaiLinh.Models.Data.VeXe>
+@Html.AntiForgeryToken()
+
+@{
+    ViewData["Title"] = "Vé của bạn";
+}
+<h2 class="mb-4 text-center mt-4" style="font-size: 25px;">Vé của bạn</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã vé</th>
+            <th>Lịch trình</th>
+            <th>Tổng giá vé</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ve in Model)
+
+        {
+            <tr>
+                <td>@ve.VeID</td>
+                <td>@ve.LichTrinh?.TuyenDuong?.TenTuyenDuong</td>
+                <td>@string.Format(CultureInfo.InvariantCulture, "{0:N0} đ", ve.TongGiaVe)</td>
+                <td>
+                    <ul style="list-style: none;">
+                        @foreach (var chiTiet in ve.ChiTietVeDats)
+                        {
+                           
+                        }
+                    </ul>
+
+@*                     <button class="btn btn-danger btn-sm" onclick="viewTicketDetails('@ve.VeID')">Chi tiết</button>
+ *@
+                    <a href="@Url.Action("ChiTietVe", "Account", new { veID = ve.VeID })" class="btn btn-danger btn-sm">Chi tiết</a>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            onclick="cancelTicket('@ve.VeID')">
+                        Hủy vé
+                    </button>
+
+                    <a href="@Url.Action("Edit", "VeXe", new { id = ve.VeID })" class="btn">Đổi ghế</a>
+                </td>
+
+
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+        function cancelTicket(veID) {
+        $.ajax({
+            url: '/ve-xe/huy/' + veID,
+            type: 'POST',
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message); // Thông báo thành công
+                    location.reload(); // Reload trang để cập nhật thông tin
+                } else {
+                    alert(response.message); // Thông báo lỗi
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+            }
+        });
+    }
+
+</script>

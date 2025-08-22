@@ -1,0 +1,185 @@
+﻿@* <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+<df-messenger chat-title="NhaXeMaiLinh"
+			  agent-id="eddea0c5-fbd8-46c8-a14a-559d035ccd91"
+			  language-code="vi"></df-messenger> *@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Popup Chat Hình Tròn</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Nút hình tròn */
+        .chat-circle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        /* Khung popup */
+        .chat-popup {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 999;
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+
+            .chat-input input {
+                flex: 1;
+                padding: 10px;
+                border: none;
+            }
+
+            .chat-input button {
+                padding: 10px;
+                border: none;
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+            }
+        .chat-message {
+            margin: 8px 0;
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+            display: inline-block;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Tin nhắn bot bên trái */
+        .bot-message {
+            background-color: #f1f1f1;
+            color: #222;
+            float: left;
+            clear: both;
+            border-bottom-left-radius: 4px; 
+        }
+
+        /* Tin nhắn user bên phải */
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            float: right;
+            clear: both;
+            border-bottom-right-radius: 4px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-circle" onclick="toggleChat()">
+        <img src="~/images/aiboxmini.png" alt="Bot" class="chat-icon"> 
+        @* <i class="fas fa-comments chat-icon"></i> *@
+    </div>
+
+    <div class="chat-popup" id="chatPopup">
+        <div class="chat-header">Hỗ trợ khách hàng</div>
+        <div class="chat-body" id="chatBody">
+            <p><strong>Bot:</strong> Xin chào! Bạn cần hỗ trợ gì?</p>
+            
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Nhập tin nhắn...">
+            <button onclick="sendChat()">Gửi</button>
+            
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+          const popup = document.getElementById("chatPopup");
+          popup.style.display = popup.style.display === "flex" ? "none" : "flex";
+        }
+
+        function sendChat() {
+            const msg = $('#chatInput').val().trim();
+            if (msg === '') return;
+
+            appendMessage('User', msg);
+            $('#chatInput').val('');
+            
+
+            $.ajax({
+                url: '/api/chat',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(msg),
+                success: function (response) {
+                    appendMessage("Bot", response);
+                },
+                error: function () {
+                    appendMessage("Bot", "Xin lỗi, có lỗi xảy ra.");
+                }
+            });
+        }
+
+        function appendMessage(sender, message) {
+             let messageClass = sender === 'User' ? 'user-message' : 'bot-message';
+            $('#chatBody').append(`
+            <div class="chat-message ${messageClass} ">${message}</div>
+        `);
+            /* $('#chatBody').append(`
+                <div class="mb-2">
+                    <strong>${sender}:</strong> ${message}
+                </div>
+            `); */
+        }
+
+        // Gán sự kiện click và keypress
+        $('#chatInput').on('keypress', function(e) {
+            if (e.which === 13) {
+                sendChat();
+            }
+        });
+    </script>
+
+</body>
+</html>

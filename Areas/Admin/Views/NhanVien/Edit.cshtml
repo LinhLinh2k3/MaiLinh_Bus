@@ -1,0 +1,146 @@
+﻿@model NhaXeMaiLinh.Models.Data.NhanVien
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 0.75rem;
+        }
+
+        .btn-primary {
+            background-color: #506fe4;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #405dcf;
+            }
+
+        .container {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+}
+
+<div class="container my-5" style="max-width: 700px;">
+    <h2 class="mb-4 text-center" style="font-size: 20px;">Chi tiết nhân viên</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="card m-b-30">
+        <div class="card-body py-5">
+            <form id="nhanVienForm" asp-area="Admin" asp-action="Edit" method="post" class="container" >
+                @Html.AntiForgeryToken()
+                <div class="form-group row align-items-center">
+                    <label for="NhanVienID" class="col-sm-4 col-form-label">Mã nhân viên :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="NhanVienID" name="NhanVienID" value="@Model.NhanVienID" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="HoTen" class="col-sm-4 col-form-label">Họ tên :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="HoTen" name="HoTen" value="@Model.HoTen" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="NgaySinh" class="col-sm-4 col-form-label">Ngày sinh :</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="NgaySinh" name="NgaySinh" value="@Model.NgaySinh?.ToString("yyyy-MM-dd")" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="GioiTinh" class="col-sm-4 col-form-label">Giới tính :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="GioiTinh" name="GioiTinh" value="@Model.GioiTinh" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="DiaChi" class="col-sm-4 col-form-label">Địa chỉ :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="DiaChi" name="DiaChi" value="@Model.DiaChi" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="SDT" class="col-sm-4 col-form-label">Số điện thoại :</label>
+                    <div class="col-sm-8">
+                        <input type="tel" id="SDT" name="SDT" value="@Model.SDT" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="Email" class="col-sm-4 col-form-label">Email :</label>
+                    <div class="col-sm-8">
+                        <input type="email" id="Email" name="Email" value="@Model.Email" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="CCCD" class="col-sm-4 col-form-label">CCCD :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="CCCD" name="CCCD" value="@Model.CCCD" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="NgayVaoLam" class="col-sm-4 col-form-label">Ngày vào làm :</label>
+                    <div class="col-sm-8">
+                        <input type="date" id="NgayVaoLam" name="NgayVaoLam" value="@Model.NgayVaoLam?.ToString("yyyy-MM-dd")" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="ChucVu" class="col-sm-4 col-form-label">Chức vụ :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="ChucVu" name="ChucVu" value="@Model.ChucVu" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center" style="display: none;">
+                    <label for="ChucVu" class="col-sm-4 col-form-label">Khóa ngoại :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="AppUserId" name="AppUserId" value="@Model.AppUserId" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="button" id="editButton" class="btn btn-primary">Sửa thông tin</button>
+                    <button type="submit" id="saveButton" class="btn btn-success" style="display: none;">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("editButton").addEventListener("click", function () {
+            var inputs = document.querySelectorAll("#nhanVienForm input");
+            inputs.forEach(function (input) {
+                if (input.id !== "NhanVienID")|| (input.id !== "AppUserId") {
+                    input.removeAttribute("readonly");
+                }
+            });
+            document.getElementById("editButton").style.display = "none";
+            document.getElementById("saveButton").style.display = "inline-block";
+        });
+
+        document.getElementById("nhanVienForm").addEventListener("submit", function (event) {
+            if (!confirm("Bạn có chắc chắn muốn lưu các thay đổi không?")) {
+                event.preventDefault();
+            }
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

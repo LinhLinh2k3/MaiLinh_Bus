@@ -1,0 +1,96 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.TaiXeViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 0.75rem;
+        }
+
+        .btn-primary {
+            background-color: #506fe4;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #405dcf;
+            }
+
+        .container {
+            font-family: "Inter", sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem; /* Increase the margin between form groups */
+        }
+        span{
+            z-index: 5;
+        }
+    </style>
+}
+
+<div class="container my-5" style="max-width: 700px;">
+    <h2 class="mb-4 text-center" style="font-size: 20px;">Thêm tài xế mới</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="font-size: 16px;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    <div class="card m-b-30">
+        <div class="card-body py-5">
+            <form asp-area="Admin" asp-controller="TaiXe" asp-action="Create" method="post" class="container">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group row align-items-center">
+                    <label for="HoTen" class="col-sm-4 col-form-label">Họ tên :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="HoTen" name="HoTen" value="@Model.HoTen" class="form-control" />
+                        <span asp-validation-for="HoTen" class="text-danger"></span>
+                        <span class="text-danger">@Html.ValidationMessageFor(m => m.HoTen)</span>
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="SDT" class="col-sm-4 col-form-label">Số điện thoại :</label>
+                    <div class="col-sm-8">
+                        <input type="tel" id="SDT" name="SDT" value="@Model.SDT" class="form-control" />
+                      
+                        <span class="text-danger">@Html.ValidationMessageFor(m => m.SDT)</span>
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="CCCD" class="col-sm-4 col-form-label">CCCD :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="CCCD" name="CCCD" value="@Model.CCCD" class="form-control" />
+                        <span class="text-danger">@Html.ValidationMessageFor(m => m.CCCD)</span>
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="BangLaiXe" class="col-sm-4 col-form-label">Bằng lái xe :</label>
+                    <div class="col-sm-8">
+                        <select id="BangLaiXe" name="BangLaiXe" class="form-control">
+                            <option value="B1" @(Model.BangLaiXe == "B1" ? "selected" : "")>B1</option>
+                            <option value="B2" @(Model.BangLaiXe == "B2" ? "selected" : "")>B2</option>
+                            <option value="C1" @(Model.BangLaiXe == "C1" ? "selected" : "")>C1</option>
+                            <option value="C2" @(Model.BangLaiXe == "C2" ? "selected" : "")>C2</option>
+                        </select>
+                        <span asp-validation-for="BangLaiXe" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Thêm tài xế</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

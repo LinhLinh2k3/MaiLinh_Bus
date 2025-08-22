@@ -1,0 +1,99 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.Xe>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar .navbar-text {
+            color: white;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+}
+<div class="container">
+    @if (TempData["SuccessMessage"] != null)
+
+
+
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+
+
+
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Danh sách xe đã xóa</h4>
+        <div class="form-group">
+            <select id="statusFilter" class="form-control" onchange="filterVehicles()">
+                <option value="/admin/danh-sach-xe">Đang hoạt động</option>
+                <option value="/admin/danh-sach-xe-da-xoa" selected>Đã xóa</option>
+            </select>
+        </div>
+        <a href="@Url.Action("Create", "Vehicle", new { area = "Admin" })" class="btn btn-primary">Tạo mới một xe</a>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã xe</th>
+                <th>Biển số</th>
+                <th>Loại xe</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.XeID</td>
+                    <td>@item.BienSo</td>
+                    <td>@item.LoaiXe?.TenLoaiXe</td>
+                    <td class="action-buttons">
+                        <form action="@Url.Action("Restore", "Vehicle", new { area = "Admin", id = item.XeID })" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn khôi phục xe này?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success btn-sm">Khôi phục</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function filterVehicles() {
+            var filter = document.getElementById("statusFilter");
+            window.location.href = filter.value;
+        }
+    </script>
+}

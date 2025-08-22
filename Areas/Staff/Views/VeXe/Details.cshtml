@@ -1,0 +1,40 @@
+﻿@using System.Globalization
+@model NhaXeMaiLinh.Models.Data.VeXe
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Chi tiết";
+    Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <div class="mx-auto col-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-3">Tên khách hàng</dt>
+                    <dd class="col-9">
+                        @Html.DisplayFor(model => model.KhachHang.HoTen)
+                    </dd>
+                    <dt class="col-3">Tuyến đường</dt>
+                    <dd class="col-9">
+                        @Html.DisplayFor(model => model.LichTrinh.TuyenDuong.TenTuyenDuong)
+                    </dd>
+                    <dt class="col-3">Khuyến mãi</dt>
+                    <dd class="col-9">
+                        @Html.DisplayFor(model => model.KhuyenMai.TenKhuyenMai)
+                    </dd>
+                    <dt class="col-3">Tiền vé</dt>
+                    <dd class="col-9">
+                        @string.Format(CultureInfo.InvariantCulture, "{0:N0} đ", Model.TongGiaVe)
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a asp-action="Edit" asp-route-id="@Model?.VeID">Chỉnh sửa</a><span class="px-2">|</span>
+                <a asp-action="Index">Trở về danh sách</a>
+            </div>
+        </div>
+    </div>
+</div>

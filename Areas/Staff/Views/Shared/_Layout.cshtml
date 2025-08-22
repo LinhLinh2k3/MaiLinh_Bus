@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- Theme mode -->
+    <script src="/js/color-modes.js"></script>
+
+    <!---- Styles ---->
+    <link rel="stylesheet" href="~/fonts/feather.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+
+    @await RenderSectionAsync("Style", required: false)
+</head>
+<body>
+    <main id="db-wrapper">
+        <!-- Sidebar -->
+        <nav class="navbar-vertical navbar">
+            <div class="vh-100" data-simplebar>
+                <!-- Brand logo -->
+                <a class="navbar-brand" href="/">
+                    <img src="@Url.Content("~/images/Logo-MaiLinh.png")" style="clip-path:circle(); border-radius:50%; width:100px; height:50px;vertical-align:middle; margin-right:-20px; margin-left:-20px;" alt="Logo-MaiLinh" />
+                    Nhà Xe Mai Linh
+                </a>
+                <!-- Navbar nav -->
+                <ul class="navbar-nav flex-column" id="sideNavbar">
+                    <!-- Vé Xe -->
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#navTicket" aria-expanded="false" aria-controls="navTicket">
+                            <i class="fa-solid fa-ticket me-3"></i>
+                            Vé Xe
+                        </a>
+                        <div id="navTicket" class="collapse " data-bs-parent="#sideNavbar">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link " href="/staff/ve-xe/quan-ly">Quản lý vé </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " href="/staff/giao-dich/quan-ly">Quản lý giao dịch </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Tin Tức -->
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#navArticle" aria-expanded="false" aria-controls="navArticle">
+                            <i class="nav-icon fe fe-book-open me-3"></i>
+                            Tin tức
+                        </a>
+                        <div id="navArticle" class="collapse" data-bs-parent="#sideNavbar">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/staff/tin-tuc/quan-ly">Quản lý tin tức</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Khách hàng -->
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#navCustomer" aria-expanded="false" aria-controls="navCustomer">
+                            <i class="fa-regular fa-user me-3"></i>
+                            Khách hàng
+                        </a>
+                        <div id="navCustomer" class="collapse " data-bs-parent="#sideNavbar">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link " href="/staff/khach-hang/quan-ly" ">Quản lý khách hàng</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Content -->
+        <section id="page-content">
+            <div class="header">
+                <!-- Navbar -->
+                <nav class="navbar-default navbar navbar-expand-lg">
+                    <a id="nav-toggle" href="#">
+                        <i class="bi bi-list"></i>
+                    </a>
+                    <!--Navbar nav -->
+                    <div class="ms-auto d-flex">
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-icon rounded-circle d-flex align-items-center" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+                                <i class="bi theme-icon-active"></i>
+                                <span class="visually-hidden bs-theme-text">Toggle theme</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bs-theme-text">
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                        <i class="bi theme-icon bi-sun-fill"></i>
+                                        <span class="ms-2">Light</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                        <i class="bi theme-icon bi-moon-stars-fill"></i>
+                                        <span class="ms-2">Dark</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                                        <i class="bi theme-icon bi-circle-half"></i>
+                                        <span class="ms-2">Auto</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <ul class="navbar-nav navbar-right-wrap ms-2 d-flex nav-top-wrap">
+                            <!-- User -->
+                            <li class="dropdown ms-2">
+                                <a class="rounded-circle" href="#" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="avatar avatar-md avatar-indicators avatar-online">
+                                        <img alt="user?.UserName" src="@Url.Content("~/images/person.jpg")" class="rounded-circle" with="40" height="40" />
+                                    </div>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
+                                    <div class="dropdown-item">
+                                        <div class="d-flex">
+                                            <div class="avatar avatar-md avatar-indicators avatar-online">
+                                                <img alt="user?.UserName" src="@Url.Content("~/images/person.jpg")" class="rounded-circle" with="40" height="40" />
+                                            </div>
+                                            <div class="ms-3 lh-1">
+                                                <h5 class="mb-1">user!.FullName</h5>
+                                                <p class="mb-2">user.UserName</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <a class="dropdown-item" href="/settings/account">
+                                                <i class="bi bi-gear me-2"></i>
+                                                Settings
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="dropdown-divider"></div>
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <a class="dropdown-item" href="/logout">
+                                                <i class="bi bi-power me-2"></i>
+                                                Sign Out
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <!-- Container fluid -->
+            <div class="container-fluid p-4">
+                @RenderBody()
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-fallback-src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-fallback-src="/lib/jquery/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/2423b05398.js" crossorigin="anonymous"></script>
+    <script src="~/js/dashboard.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

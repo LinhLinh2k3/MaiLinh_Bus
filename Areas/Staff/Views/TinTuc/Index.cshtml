@@ -1,0 +1,176 @@
+﻿@using NhaXeMaiLinh.Services
+@model ICollection<NhaXeMaiLinh.Models.Data.TinTuc>
+
+@{
+	ViewData["Title"] = "Bài viết";
+	ViewData["tin-tuc"] = "active";
+	Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+<!--Pageheader start-->
+<section class="py-5 py-lg-8">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-12">
+                <div class="text-center">
+                    <h1 class="mb-3">@ViewData["Title"]</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Pageheader end-->
+<!--Blog list start-->
+<section class="mb-xl-9 my-4">
+    <div class="container-fluid">
+        <div class="row mb-5">
+            <div class="col-lg-7 col-md-5 col-12 d-none d-lg-block">
+                <a href="/staff/tin-tuc/them" class="btn btn-primary">Tạo tin tức</a>
+            </div>
+        </div>
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="row">
+                <div class="col-12">
+                    @foreach (var tintuc in Model)
+                    {
+                        <article class="row d-flex align-items-center mb-7 mb-md-5 border border-1 rounded-3">
+                            <div class="col-lg-5 col-xl-5 col-md-12 col-12 my-3">
+                                <figure class="mb-4 mb-lg-0 zoom-img">
+                                    <a href="@Url.Content("/staff/tin-tuc/xem/"+ tintuc.Url)">
+                                        <img src="@Url.Content("~/" + tintuc.AnhBia)" alt="@tintuc.TieuDe" class="img-fluid rounded-3">
+                                    </a>
+                                </figure>
+                            </div>
+                            <div class="col-lg-7 col-xl-7 col-md-12 col-12 mb-3">
+                                <div class="ms-lg-4">
+                                    <div>
+                                        <h3 class="lh-base h3">
+                                            <a href="@Url.Content("/staff/tin-tuc/xem/"+ tintuc.Url)" class="text-reset">
+                                                @tintuc.TieuDe
+                                            </a>
+                                        </h3>
+                                        <p class="col-10 text-truncate">@FileManager.StripHtmlTags(tintuc.NoiDung)</p>
+                                    </div>
+                                    <div class="d-md-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                                            <div class="d-flex align-items-center">
+                                                <img src="@Url.Content("~/images/person.jpg")" alt="@tintuc.NhanVien.HoTen" class="avatar avatar-xs rounded-circle">
+                                                <div class="ms-2">
+                                                    <a href="#" class="text-reset fs-6">@tintuc.NhanVien.HoTen</a>
+                                                </div>
+                                            </div>
+                                            <div class="ms-3"><span class="fs-6">@tintuc.ThoiGian</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex mt-3">
+                                        <a href="@Url.Content("~/staff/tin-tuc/chinh-sua/" + tintuc.TinTucId)" class="btn btn-primary me-2">Chỉnh sửa</a>
+                                        <form action="@Url.Action("Xoa", new { id = tintuc.TinTucId })" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <a href="#" id="show_confirm" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#delModal" data-title="@tintuc.TieuDe">Delete</a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+                <div class="col-lg-12">
+                    @if (ViewBag.TotalPages > 0)
+                    {
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                @if (ViewBag.CurrentPage > 1)
+                                {
+                                    <li class="page-item mx-1 @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { trang = ViewBag.CurrentPage - 1 })" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                            <span class="sr-only">Trước</span>
+                                        </a>
+                                    </li>
+                                }
+
+                                @{
+                                    var startPage = Math.Max(ViewBag.CurrentPage - 2, 1);
+                                    var endPage = Math.Min(startPage + 4, ViewBag.TotalPages);
+                                    startPage = Math.Max(endPage - 4, 1);
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item mx-1 @(ViewBag.CurrentPage == i ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { trang = i })">@i</a>
+                                    </li>
+                                }
+
+                                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                {
+                                    <li class="page-item mx-1 @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { trang = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                            <span class="sr-only">Sau</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12">
+                    <p>Không có tin tức!</p>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+<!--Blog list end-->
+<!-- Modal -->
+<div class="modal fade" id="delModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Cảnh báo!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center fs-4 fw-bold mbodyTitle">Bạn có chắc xóa tin tức này không?</p>
+                <p class="text-center fs-5 font-monospace mbodyContent"></p>
+                <p class="text-center fs-6 fst-italic mbodyFooter">Bạn sẽ không hoàn tác lại được!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-confirm">Có</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('a#show_confirm').click(function(event) {
+            var form = $(this).closest("form");
+            var name = $(this).data('title');
+            event.preventDefault();
+
+            var delModal = document.getElementById("delModal");
+            delModal.style.display = "block";
+
+            var modalBodyContent = delModal.querySelector('.modal-body .mbodyContent');
+            modalBodyContent.textContent = name;
+
+            $('.btn-confirm').click(function(e) {
+                e.preventDefault();
+                try {
+                    form.submit();
+                } catch (err) {
+                    HTMLFormElement.prototype.submit.call(form);
+                }
+            });
+        });
+    </script>
+}

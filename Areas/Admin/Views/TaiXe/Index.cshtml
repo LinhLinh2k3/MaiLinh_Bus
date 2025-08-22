@@ -1,0 +1,94 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.TaiXe>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar .navbar-text {
+                color: white;
+            }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        
+        function confirmDelete(event) {
+            if (!confirm('Bạn có chắc chắn muốn xóa tài xế này?')) {
+                event.preventDefault(); 
+            }
+        }
+    </script>
+}
+
+<div class="container">
+    <!-- Hiển thị thông báo thành công hoặc lỗi -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Danh sách tài xế</h4>
+        <a href="@Url.Content("/admin/them-tai-xe/")" class="btn btn-primary">Tạo mới một tài xế</a>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã tài xế</th>
+                <th>Họ và tên</th>
+                <th>Số điện thoại</th>
+                <th>CCCD</th>
+                <th>Bằng lái xe</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TaiXeID</td>
+                    <td>@item.HoTen</td>
+                    <td>@item.SDT</td>
+                    <td>@item.CCCD</td>
+                    <td>@item.BangLaiXe</td>
+                    <td class="action-buttons">
+                        <a href="@Url.Content("/chi-tiet-tai-xe/" + item.TaiXeID)" class="btn btn-success btn-sm">Chi tiết</a>
+                        <form action="@Url.Action("Delete", new { id = item.TaiXeID })" method="post" class="d-inline" onsubmit="confirmDelete(event)">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,49 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.XeViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Thêm xe mới</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="Create" asp-area="Admin" asp-controller="Xe" method="post" class="form">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label for="BienSo">Biển số</label>
+            <input type="text" id="BienSo" name="BienSo" class="form-control" placeholder="Nhập biển số xe" />
+            <span class="text-danger">@Html.ValidationMessage("BienSo")</span>
+        </div>
+
+        <div class="form-group">
+            <label for="LoaiXeId">Loại xe</label>
+            <select id="LoaiXeId" name="LoaiXeId" class="form-control">
+                <option value="">-- Chọn loại xe --</option>
+                @foreach (var loaiXe in Model.LoaiXes)
+                {
+                    <option value="@loaiXe.LoaiXeID">@loaiXe.TenLoaiXe</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessage("LoaiXeId")</span>
+        </div>
+
+        <div class="form-group">
+            <label for="TinhTrang">Tình trạng</label>
+            <input type="text" id="TinhTrang" name="TinhTrang" class="form-control" placeholder="Nhập tình trạng xe" />
+            <span class="text-danger">@Html.ValidationMessage("TinhTrang")</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3 text-center">Thêm xe</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

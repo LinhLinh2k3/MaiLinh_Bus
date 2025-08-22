@@ -1,0 +1,112 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.LichTrinh>
+
+@using Microsoft.AspNetCore.Identity
+@using NhaXeMaiLinh.Models.Data
+@inject SignInManager<AppUser> SignInManager
+
+<table class="table" >
+    <thead class="fs-6" style="font-family: ABeeZee, sans-serif;">
+        <tr>
+            <th class="col-md-3 col-lg-2 text-nowrap">Tuyến xe</th>
+            <th class="col-md-3 col-lg-2 text-nowrap">Loại xe</th>
+            <th class="col-md-3 col-lg-2 text-nowrap">Quãng đường</th>
+            <th class="col-md-3 col-lg-2 text-nowrap">Thời gian hành trình</th>
+            <th class="col-md-3 col-lg-2 text-nowrap">Giá vé</th>
+            <th class="col-md-3 col-lg-2 text-nowrap">Thông tin</th>
+        </tr>
+    </thead>
+     <tbody style="font-family: ABeeZee, sans-serif;">
+        @foreach (var hanhTrinh in Model)
+        {
+            <tr>
+                <td>@hanhTrinh.TuyenDuong.TenTuyenDuong</td>
+                <td>@hanhTrinh.Xe.LoaiXe.TenLoaiXe</td>
+                <td>@hanhTrinh.TuyenDuong.QuangDuong km</td>
+                <td>@hanhTrinh.GioKhoiHanh - @hanhTrinh.GioDen</td>
+                <td class="text-nowrap">
+                    @if (hanhTrinh.GiaVe > 0)
+                    {
+                        var giaVe = hanhTrinh.GiaVe;
+                        @($"{giaVe:N0} VND") @* Giá vé từ thuộc tính GiaVe *@
+                    }
+                    else
+                    {
+                        <span>---</span>
+                    }
+                </td>
+                <td>
+                    @* // Chi cho phep hien nut nay neu ng dung login oy *@
+
+                    @if (User != null || SignInManager.IsSignedIn(User))
+                    {
+                        <button class="btn btn-primary toggle-details" data-id="@hanhTrinh.LichTrinhId"
+                                data-gia-ve="@hanhTrinh.GiaVe" data-loai-xe="@hanhTrinh.Xe.LoaiXe.TenLoaiXe">
+                            Chi tiết
+                        </button> @* Giá ghế từ thuộc tính GiaVe *@
+                    }
+                    else
+                    {
+                        <span>Đăng nhập để xem chi tiết</span>
+                    }
+                </td>
+            </tr>
+            <!-- Hàng chi tiết ghế, ẩn ban đầu -->
+            <tr class="details-row" id="details-@hanhTrinh.LichTrinhId" style="display: none;">
+                <td colspan="6">
+                    <!-- Chèn giao diện chọn ghế -->
+                    <div class="container bg-white p-4 rounded shadow-sm">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Chọn ghế</h1>
+                        </div>
+                        <div class="d-flex flex-column flex-sm-row justify-content-center mb-4">
+                            <div class="tang-duoi mb-4 mb-sm-0 me-sm-4">
+                                <h2 class="h6 mb-3">Tầng dưới</h2>
+                                <div class="d-grid gap-2 d-md-grid" id="tangduoi">        
+                                </div>
+                            </div>
+                            <div class="tang-tren">
+                                <h2 class="h6 mb-3">Tầng trên</h2>
+                                <div class="d-grid gap-2 d-md-grid" id="tangtren">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend" style="background-color: #bdbdbd;"></div>
+                                <span>Đã bán</span>
+                            </div>
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend" style="background-color: #e3f2fd;"></div>
+                                <span>Còn trống</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="legend" style="background-color: #fee2e2;"></div>
+                                <span>Đang chọn</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phần hiển thị thông tin ghế đã chọn -->
+                    <div id="selectedSeatsInfo" class="flex w-full items-center justify-between px-4 text-sm"
+                         style="display: none;">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#4A4A4A]" id="seatCountText"></span>
+                            <span class="text-black" id="selectedSeatsText"></span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-right text-[#4A4A4A]">
+                                <span>Tổng tiền </span><br>
+                                <span class="text-base font-semibold text-orange" id="totalPriceText"></span>
+                            </span>
+                            <button type="button"
+                                    class="ant-btn ant-btn-round ant-btn-primary button-default active w-40"
+                                    id="selectButton" onclick="chonGhe('@hanhTrinh.LichTrinhId')">
+                                Chọn
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

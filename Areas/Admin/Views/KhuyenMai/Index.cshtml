@@ -1,0 +1,104 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.KhuyenMai>
+
+@{
+    ViewData["Title"] = "Danh Sách Khuyến Mãi";
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+@section Style {
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+            .navbar .navbar-text {
+                color: white;
+            }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete(event) {
+            if (!confirm('Bạn có chắc chắn muốn xóa khuyến mãi này?')) {
+                event.preventDefault();
+            }
+        }
+    </script>
+}
+
+<div class="container">
+    <!-- Hiển thị thông báo thành công hoặc lỗi -->
+    @if (TempData["SuccessMessage"] != null)
+
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Danh sách khuyến mãi</h4>
+        <a href="@Url.Content("/admin/khuyen-mai/tao-khuyen-mai")" class="btn btn-primary">Tạo mới một khuyến mãi</a>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tên Khuyến Mãi</th>
+                <th>Loại Khuyến Mãi</th>
+                <th>Ngày Bắt Đầu</th>
+                <th>Ngày Kết Thúc</th>
+                <th>Giá Trị Giảm</th>
+                <th>Điều Kiện Áp Dụng</th>
+                <th>Trạng Thái Thanh Toán</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TenKhuyenMai</td>
+                    <td>@item.LoaiKhuyenMai</td>
+                    <td>@item.NgayBatDau.ToString("yyyy-MM-dd")</td>
+                    <td>@item.NgayKetThuc.ToString("yyyy-MM-dd")</td>
+                    <td>@item.GiaTriGiam</td>
+                    <td>@item.DieuKienApDung</td>
+                    <td>@item.TrangThaiThanhToan</td>
+                    <td class="action-buttons">
+                        <a href="@Url.Action("Edit", "KhuyenMai", new { area = "Admin", id = item.KhuyenMaiID })" class="btn btn-success btn-sm">Chi tiết</a>
+                        <form action="@Url.Action("Delete", new { id = item.KhuyenMaiID })" method="post" class="d-inline" onsubmit="confirmDelete(event)">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

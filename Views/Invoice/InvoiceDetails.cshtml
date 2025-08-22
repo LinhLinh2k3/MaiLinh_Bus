@@ -1,0 +1,152 @@
+﻿@model NhaXeMaiLinh.Models.Data.HoaDon
+@{
+    ViewData["Title"] = "Chi tiết hóa đơn";
+}
+@section Style {
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .ticket-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+            .header .company-name {
+                color: red;
+                font-weight: bold;
+                font-size: 20px;
+            }
+
+            .header .slogan {
+                color: green;
+                font-size: 20px;
+                font-size: bold;
+            }
+
+        .content {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .content .title {
+                color: red;
+                font-weight: bold;
+                font-size: 23px;
+            }
+
+            .content .subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+        .details {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+            .details .route {
+                font-weight: bold;
+            }
+
+            .details .highlight {
+                font-weight: bold;
+                color: red;
+            }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .footer a {
+                color: blue;
+            }
+
+            .footer .code {
+                font-weight: bold;
+            }
+    </style>
+}
+<div class="ticket-container">
+    <div class="header">
+        <div class="slogan">
+            CHẤT LƯỢNG LÀ DANH DỰ
+        </div>
+    </div>
+    <div class="content">
+        <div class="company-info">
+            <p>
+                CHI NHÁNH HUẾ CÔNG TY CỔ PHẦN MAI LINH
+            </p>
+            <p>
+                Địa chỉ: 97 An Dương Vương, Phường An Đông, Thành phố Huế, Tỉnh Thừa Thiên Huế, Việt Nam
+            </p>
+            <p>
+                Điện thoại: 02343870870    Mã số thuế: 0312241579-012
+            </p>
+        </div>
+        <div class="title">
+            VÉ XE KHÁCH
+        </div>
+        <div class="subtitle">
+            (Bản thể hiện của hóa đơn điện tử)
+        </div>
+    </div>
+    <div class="details">
+        <p>
+            Lộ trình:
+            <span class="route">
+                @Model.VeXe.LichTrinh.TuyenDuong.DiemDi - @Model.VeXe.LichTrinh.TuyenDuong.DiemDen
+            </span>
+        </p>
+        <p>
+            Mã số tuyến:
+            <span class="highlight">
+                @Model.VeXe.LichTrinh.TuyenDuong.TuyenDuongID
+            </span>
+        </p>
+        <p>
+            Giá vé:
+            <span class="highlight">
+                @Model.VeXe.LichTrinh.GiaVe.ToString("#,##0") VNĐ
+            </span>
+            (Giá trên đã bao gồm bảo hiểm hành khách)
+        </p>
+        <p>
+            Số xe:
+            <span class="highlight">
+                @Model.VeXe.LichTrinh.Xe.BienSo
+            </span>
+        </p>
+        <hr />
+        <p>
+            Thời gian xuất bến:
+            <span class="highlight">
+                @Model.VeXe.LichTrinh.GioKhoiHanh
+            </span>
+        </p>
+        <p>
+            Ngày khởi hành:
+            <span class="highlight">
+                @Model.VeXe.LichTrinh.NgayKhoiHanh
+            </span>
+        </p>
+        <hr />
+    </div>
+    <div class="footer">
+        <p>
+            Mã số tra cứu:
+            <span class="code">
+                @Model.VeID
+            </span>
+        </p>
+    </div>
+</div>

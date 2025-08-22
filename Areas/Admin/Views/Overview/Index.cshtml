@@ -1,0 +1,146 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+<div class="container my-5">
+    <h2 class="text-center">Tổng Quan Hệ Thống</h2>
+
+    <div class="row my-4">
+        <!-- Khuyến Mãi -->
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Tổng Số Khuyến Mãi</h5>
+                    <h3>@Model.TotalPromotions</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Khuyến Mãi Kích Hoạt</h5>
+                    <h3>@Model.ActivePromotions</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nhân Viên -->
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Tổng Số Nhân Viên</h5>
+                    <h3>@Model.TotalEmployees</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-4">
+        <!-- Lịch Trình -->
+        <div class="col-md-6">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Tổng Số Lịch Trình</h5>
+                    <h3>@Model.TotalSchedules</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5>Lịch Trình Hôm Nay</h5>
+                    <h3>@Model.SchedulesToday</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-4">
+        <!-- Xe -->
+        <div class="col-md-6">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5>Tổng Số Xe</h5>
+                    <h3>@Model.TotalVehicles</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5>Xe Đang Hoạt Động</h5>
+                    <h3>@Model.ActiveVehicles</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-4">
+        <!-- Tài Xế -->
+        <div class="col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Tổng Số Tài Xế</h5>
+                    <h3>@Model.TotalDrivers</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Tài Xế Sẵn Sàng</h5>
+                    <h3>@Model.AvailableDrivers</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container my-5">
+    <h3 class="text-center">Biểu Đồ Phân Tích</h3>
+    <canvas id="overviewChart"></canvas>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('overviewChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Khuyến Mãi', 'Nhân Viên', 'Lịch Trình', 'Xe', 'Tài Xế'],
+                datasets: [{
+                    label: 'Thống Kê Tổng Quan',
+                    data: [
+        @Model.TotalPromotions,
+        @Model.TotalEmployees,
+        @Model.TotalSchedules,
+        @Model.TotalVehicles,
+        @Model.TotalDrivers
+                    ],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+    </script>
+}

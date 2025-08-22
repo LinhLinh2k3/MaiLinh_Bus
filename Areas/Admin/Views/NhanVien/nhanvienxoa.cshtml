@@ -1,0 +1,85 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.NhanVien>
+@{
+    ViewData["Title"] = "Quản lý nhân viên đã xóa";
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+@section Style {
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+            .navbar .navbar-text {
+                color: white;
+            }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Danh sách nhân viên đã xóa</h4>
+        <div class="form-group">
+            <select id="statusFilter" class="form-control" onchange="filterEmployees()">
+                <option value="@Url.Action("Index", "NhanVien", new { area = "Admin" })">Đang hoạt động</option>
+                <option value="@Url.Action("nhanvienxoa", "NhanVien", new { area = "Admin" })" selected>Đã xóa</option>
+            </select>
+        </div>
+        <a href="@Url.Content("/admin/nhanvien/tao-nhan-vien")" class="btn btn-primary">Thêm nhân viên mới</a>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã nhân viên</th>
+                <th>Email</th>
+                <th>Họ và tên</th>
+                <th>Chức vụ</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.NhanVienID</td>
+                    <td>@item.Email</td>
+                    <td>@item.HoTen</td>
+                    <td>@item.ChucVu</td>
+                    <td class="action-buttons">
+                        <form action="@Url.Action("Restore", "NhanVien", new { area = "Admin", id = item.NhanVienID })" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn khôi phục nhân viên này không?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary btn-sm">Khôi phục</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function filterEmployees() {
+            var filter = document.getElementById("statusFilter").value;
+            window.location.href = filter;
+        }
+    </script>
+}

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.LichSuGiaoDich>
+
+@{
+    ViewData["Title"] = "Lịch sử giao dịch";
+}
+<h2 class="mb-4 text-center mt-3" style="font-size: 25px;">Lịch sử giao dịch</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã giao dịch</th>
+            <th>Loại giao dịch</th>
+            <th>Chi tiết</th>
+            <th>Ngày giao dịch</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in Model)
+
+        {
+            <tr>
+                <td>@transaction.GiaoDichID</td>
+                <td>@transaction.LoaiGiaoDich</td>
+                <td>@transaction.ChiTiet</td>
+                <td>@transaction.NgayGiaoDich.ToString("dd/MM/yyyy")</td>
+            @*   <td>transaction.NhanVien?.TenNhanVien</td>  *@
+                <td>@transaction.TrangThaiGiaoDich</td>
+            </tr>
+        }
+    </tbody>
+</table>

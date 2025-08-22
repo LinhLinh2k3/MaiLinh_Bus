@@ -1,0 +1,111 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.LichTrinh>
+
+@{
+    ViewData["Title"] = "Danh Sách Lịch Trình";
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+@section Style {
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+            .navbar .navbar-text {
+                color: white;
+            }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete(event) {
+            if (!confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) {
+                event.preventDefault();
+            }
+        }
+    </script>
+}
+
+<div class="container">
+    <!-- Hiển thị thông báo thành công hoặc lỗi -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Danh sách lịch trình</h4>
+        <a href="@Url.Content("/admin/route/tao-lich-trinh")" class="btn btn-primary">Tạo mới một lịch trình</a>
+    </div>
+
+    <!-- Bộ lọc theo ngày -->
+    <form method="get" action="@Url.Action("Index", "Route", new { area = "Admin" })" class="form-inline mb-3">
+        <div class="form-group col-4 mr-2 mb-1">
+            <label for="filterDate" class="mr-2">Chọn ngày khởi hành:</label>
+            <input type="date" id="filterDate" name="date" class="form-control" value="@ViewData["FilterDate"]" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lọc</button>
+    </form>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Xe</th>
+                <th>Tuyến Đường</th>
+                <th>Giờ Khởi Hành</th>
+                <th>Giờ Đến</th>
+                <th>Ngày Khởi Hành</th>
+                <th>Ngày Đến</th>
+                <th>Giá Vé</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Xe.BienSo</td>
+                    <td>@item.TuyenDuong.TenTuyenDuong</td>
+                    <td>@item.GioKhoiHanh</td>
+                    <td>@item.GioDen</td>
+                    <td>@item.NgayKhoiHanh</td>
+                    <td>@item.NgayDen</td>
+                    <td>@item.GiaVe</td>
+                    <td class="action-buttons">
+                        <a href="@Url.Action("Edit", "Route", new { area = "Admin", id = item.LichTrinhId })" class="btn btn-success btn-sm">Chi tiết</a>
+                        <form action="@Url.Action("Delete", new { id = item.LichTrinhId })" method="post" class="d-inline" onsubmit="confirmDelete(event)">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

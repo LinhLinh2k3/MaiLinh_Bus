@@ -1,0 +1,193 @@
+﻿@model NhaXeMaiLinh.Models.Data.TinTuc
+
+@{
+    ViewData["Title"] = "Chi tiết bài viết";
+    ViewData["tin-tuc"] = "active";
+    var tintuc = Model;
+}
+
+@section Style {
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+    <style>
+        .ql-bg-black {
+            background-color: #000
+        }
+
+        .ql-bg-red {
+            background-color: #e60000
+        }
+
+        .ql-bg-orange {
+            background-color: #f90
+        }
+
+        .ql-bg-yellow {
+            background-color: #ff0
+        }
+
+        .ql-bg-green {
+            background-color: #008a00
+        }
+
+        .ql-bg-blue {
+            background-color: #06c
+        }
+
+        .ql-bg-purple {
+            background-color: #93f
+        }
+
+        .ql-color-white {
+            color: #fff
+        }
+
+        .ql-color-red {
+            color: #e60000
+        }
+
+        .ql-color-orange {
+            color: #f90
+        }
+
+        .ql-color-yellow {
+            color: #ff0
+        }
+
+        .ql-color-green {
+            color: #008a00
+        }
+
+        .ql-color-blue {
+            color: #06c
+        }
+
+        .ql-color-purple {
+            color: #93f
+        }
+
+        .ql-font-serif {
+            font-family: Georgia,Times New Roman,serif
+        }
+
+        .ql-font-monospace {
+            font-family: Monaco,Courier New,monospace
+        }
+
+        .ql-size-small {
+            font-size: .75em
+        }
+
+        .ql-size-large {
+            font-size: 1.5em
+        }
+
+        .ql-size-huge {
+            font-size: 2.5em
+        }
+
+        .ql-direction-rtl {
+            direction: rtl;
+            text-align: inherit
+        }
+
+        .ql-align-center {
+            text-align: center
+        }
+
+        .ql-align-justify {
+            text-align: justify
+        }
+
+        .ql-align-right {
+            text-align: right
+        }
+
+        .square-box {
+            width: 100%;
+            padding-bottom: 100%; /* Aspect Ratio 1:1 */
+            position: relative;
+            overflow: hidden;
+        }
+
+            .square-box img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+            }
+
+        .card-horizontal {
+            display: flex;
+            align-items: stretch;
+        }
+
+            .card-horizontal .card-body {
+                flex: 1;
+                padding: 20px; /* Ensure there's padding inside the card body */
+            }
+    </style>
+}
+
+<!-- Article start -->
+<div class="py-xl-9 py-8">
+    <div class="container-fluid">
+        <div class="row">
+            <article class="col-lg-8 offset-lg-2">
+                <h1 class="text-center fs-1">@Model.TieuDe</h1>
+                <div class="d-flex mt-lg-6 mt-4">
+                    <div class="me-5">
+                        <span class="fs-6">Viết bởi</span>
+                        <div class="d-flex mt-2">
+                            <img src="@Url.Content("~/images/person.jpg")" alt="@Model.NhanVien.HoTen" class="avatar avatar-xs rounded-circle">
+                            <div class="ms-2">
+                                <p class="text-reset fs-5 fw-bold">@Model.NhanVien.HoTen</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="me-5">
+                        <span class="fs-6">Xuất bản vào</span>
+                        <div class="mt-2 text-dark">
+                            <span class="fs-5 fw-bold">@Model.ThoiGian</span>
+                        </div>
+                    </div>
+                </div>
+                <figure class="my-4">
+                    <img src="@Url.Content("~/" + Model.AnhBia)" alt="@Model.TieuDe" class="rounded-3 img-fluid w-100">
+                </figure>
+                <p class="col-12">
+                    @Html.Raw(Model.NoiDung)
+                </p>
+                <hr class="mt-4 mb-4" />
+                <div class="mt-2">
+                    <div class="row g-4">
+                        @foreach (var file in Model.FileTinTuc)
+                        {
+                            @if (file.Loai != "TinTuc/AnhBia")
+                            {
+                                <div class="col-md-3 mb-4">
+                                    <div class="card card-horizontal">
+                                        <div class="square-box">
+                                            <img src="@(file.Loai == "TinTuc/Filetintuc/Anh" ? Url.Content("~/" + file.FilePath) :
+                                                        file.Loai == "TinTuc/Filetintuc/Doc" && (file.TenFile.Contains(".doc") || file.TenFile.Contains(".docx")) ? "https://upload.wikimedia.org/wikipedia/commons/f/fb/.docx_icon.svg" :
+                                                        file.Loai == "TinTuc/Filetintuc/Doc" && file.TenFile.Contains(".pdf") ? "https://png.pngtree.com/png-clipart/20220612/original/pngtree-pdf-file-icon-png-png-image_7965915.png" :
+                                                        "https://freesvg.org/img/matt-icons_file-x-unknown.png")"
+                                                 class="img-fluid rounded-top-3"
+                                                 alt="@file.TenFile" />
+                                        </div>
+                                        <div class="card-body">
+                                            <a class="card-text lead h4" href="#" onclick="location.href='@Url.Action("TaiFile", "TinTuc", new { fileId = file.FileId })'" download>@file.TenFile</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+<!-- Article end -->

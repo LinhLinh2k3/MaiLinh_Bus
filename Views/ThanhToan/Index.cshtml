@@ -1,0 +1,125 @@
+﻿@model NhaXeMaiLinh.ViewModels.ThongTinThanhToan;
+@using NhaXeMaiLinh.Services;
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="payment-methods">
+                <h5>
+                    Chọn phương thức thanh toán
+                </h5>
+                <form asp-controller="ThanhToan" asp-action="ProcessPayment" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-check">
+                        <input class="form-check-input" id="vnPay" name="paymentMethod" type="radio" value="vnpay" />
+                        <label class="form-check-label" for="vnPay">
+                            <img src="~/images/vnpay-logo.jpg" alt="VNPay" height="20" width="20" />
+                            <span class="ms-2">VNPay</span>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="momo" name="paymentMethod" type="radio" value="momo" />
+                        <label class="form-check-label" for="momo">
+                            <img src="/images/momo-logo.png" alt="MoMo" height="20" width="20" />
+                            <span class="ms-2">MoMo</span>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="zaloPay" name="paymentMethod" type="radio" value="zalopay" />
+                        <label class="form-check-label" for="zaloPay">
+                            <img src="/images/zalopay-logo.png" alt="ZaloPay" height="20" width="20" />
+                            <span class="ms-2">ZaloPay</span>
+                        </label>
+                    </div>
+                    <input type="hidden" class="form-control" name="amount" placeholder="Nhập số tiền" required value="@TempData["GiaTien"]"/>
+                    <input type="hidden" name="orderId" value="@Generator.GenOrderId()" /> @* sinh mã ngầu nhiên *@
+                    <input type="hidden" name="orderInfo" value="Thông tin thanh toán" />
+                    <button type="submit" class="btn btn-primary">Thanh Toán</button>
+                </form>
+            </div>
+
+
+
+        </div>
+        <div class="col-md-6">
+            <div class="info-box">
+                <h5>Thông tin hành khách</h5>
+                <p><span class="bold">Họ tên:</span> @Model.KhachHang.HoTen</p>
+                <p><span class="bold">Số điện thoại:</span> @Model.KhachHang.SDT</p>
+                <p><span class="bold">Email:</span> @Model.KhachHang.Email</p>
+
+            </div>
+            <div class="info-box">
+                <h5>Thông tin lượt đi</h5>
+                <p><span class="bold">Tuyến xe: </span>@ViewData["TenTuyenDuong"]</p>
+                <p><span class="bold">Thời gian: </span>@ViewData["ThoiGian"]</p>
+                <p><span class="bold">Số lượng ghế: </span>@ViewData["SoLuongGhe"]</p>
+                <p><span class="bold">Tổng thanh toán: </span>@string.Format("{0:N0}", ViewData["GiaTien"]).Replace(",", ".")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Khóa trường orderId và orderInfo
+            $("input[name='orderId']").attr("readonly", true);
+            $("input[name='orderInfo']").attr("readonly", true);
+            
+        }); 
+    </script>
+}
+
+@section Style {
+    <style>
+        body {
+            background-color: #e0f7fa;
+        }
+
+        .payment-methods {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .info-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+            .info-box h5 {
+                font-weight: bold;
+            }
+
+            .info-box p {
+                margin: 0;
+            }
+
+        .text-green {
+            color: green;
+        }
+
+        .text-red {
+            color: red;
+        }
+
+        .payment-methods img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+}

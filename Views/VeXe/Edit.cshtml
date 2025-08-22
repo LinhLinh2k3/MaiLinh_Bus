@@ -1,0 +1,370 @@
+﻿@model NhaXeMaiLinh.Models.Data.VeXe
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Chỉnh sửa vé";
+}
+
+@section Style {
+    <style>
+        .legend {
+            width: 20px;
+            height: 14px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .selected {
+            background-color: #50c878 !important;
+            border-color: #50c878 !important;
+        }
+
+            .selected:hover {
+                background-color: #80cd76 !important;
+                border-color: #80cd76 !important;
+            }
+
+        .removed {
+            background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1)) !important;
+            border-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1)) !important;
+        }
+
+            .removed:hover {
+                background-color: RGBA(var(--bs-light-info-rgb), var(--bs-bg-opacity, 1)) !important;
+                border-color: RGBA(var(--bs-light-info-rgb), var(--bs-bg-opacity, 1)) !important;
+            }
+    </style>
+}
+
+
+<h2 class="mb-4 text-center mt-4" style="font-size: 25px;">Đổi vé</h2>
+<div class="row">
+    <div class="offset-xl-3 col-xl-6 col-12">
+        <form asp-action="Edit" asp-controller="VeXe" asp-area="" id="editTicket">
+            <div class="card mb-4">
+                <div class="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%; transition: width 0.6s ease;"></div>
+                </div>
+                <!-- card body -->
+                <div class="card-body">
+                    <!-- Thông tin cơ bản -->
+                    <input type="hidden" asp-for="KhachHangID" />
+                    <input type="hidden" asp-for="LichTrinhID" />
+                    <!-- Chọn ghế -->
+                    <div class="d-none row gx-3" id="step">
+                        <div class="d-flex flex-column justify-content-start align-items-start mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Chọn ghế</h1>
+                            <p class="mb-4 mb-sm-0 fw-light">Lưu ý: Chỉ được đổi 1 ghế (1 ghế bỏ đi, 1 ghế thêm mới)</p>
+                        </div>
+                        <div class="d-none flex-column justify-content-center mb-4" id="none">
+                            <img src="~/images/error.png" class="img-fluid d-block mx-auto" style="max-width: 100px; max-height: 100%" />
+                            <p class="text-center fw-bold text-danger mt-2 fs-3">Không có vé!</p>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center mb-4" id="seatContainer">
+                            <div class="d-none" id="tang-tren">
+                                <h2 class="h6">Tầng trên</h2>
+                                <div class="d-block text-center seat-row"></div>
+                            </div>
+
+                            <div class="d-none my-4" id="tang-duoi">
+                                <h2 class="h6">Tầng dưới</h2>
+                                <div class="d-block text-center seat-row"></div>
+                            </div>
+
+                            <div class="d-none" id="bth">
+                                <div class="d-block text-center seat-row"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center my-3" id="containerFooter">
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend text-bg-secondary"></div>
+                                <span>Còn trống</span>
+                            </div>
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend text-bg-danger"></div>
+                                <span>Đã bán</span>
+                            </div>
+                            <div class="d-flex align-items-center me-4">
+                                <div class="legend text-bg-warning"></div>
+                                <span>Đang chọn</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="legend text-bg-info"></div>
+                                <span>Đang hủy</span>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary" id="nextBtn-2" onclick="nextStep()" disabled>Sau</button>
+                        </div>
+                    </div>
+
+                    <!-- Lý do đổi -->
+                    <div class="d-none row gs-3" id="step">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Lý do đổi ghế</h1>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="LyDo" class="control-label">Lý do <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="LyDo" name="LyDo" aria-label="With textarea"></textarea>
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep()">Trước</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn-3" onclick="nextStep()" disabled>Sau</button>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin thanh toán -->
+                    <div class="d-none row gx-3" id="step">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+                            <h1 class="h4 mb-4 mb-sm-0">Thông tin thanh toán</h1>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label for="GiaVe" class="control-label">Tổng tiền vé</label>
+                            <input type="text" id="GiaVe" class="form-control" disabled readonly />
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label asp-for="KhuyenMaiID" class="control-label">Khuyến mãi <span class="text-danger">*</span></label>
+                            <select asp-for="KhuyenMaiID" class="form-select" asp-items="ViewBag.KhuyenMaiID"></select>
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <input type="hidden" asp-for="TongGiaVe" />
+                            <label for="TongTien" class="control-label">Thành tiền</label>
+                            <input type="text" id="TongTien" class="form-control" disabled readonly />
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep()">Trước</button>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Index">Trở về danh sách</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        let selectedSeat = null;
+        let removedSeat = null;
+        let currentStep = 0;
+        let discountValue = 0;
+        const steps = document.querySelectorAll('#step');
+        const progressBar = document.getElementById('progressBar');
+
+        function showStep(step) {
+            steps.forEach((s, index) => {
+                s.classList.toggle('d-none', index !== step);
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+                updateProgressBar();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                updateProgressBar();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentStep / steps.length) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+
+        function autoFill() {
+            var itemId = $('#LichTrinhID').val();
+            if (itemId) {
+                $.ajax({
+                    url: '/thong-tin/lich-trinh/ghe?id=' + itemId,
+                    method: 'GET',
+                    success: function (data) {
+                        displaySeats(data);
+                    }
+                });
+            }
+        }
+
+        function formatVND(number) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                .format(number)
+                .replace('₫', ' đ'); // Replace the default "₫" with " đ"
+        }
+
+        function giaTien() {
+            var itemId = $('#LichTrinhID').val();
+            if (itemId) {
+                $.ajax({
+                    url: '/thong-tin/lich-trinh/tien?id=' + itemId,
+                    method: 'GET',
+                    success: function (data) {
+                        const totalPrice = parseFloat(data);
+                        const discountedPrice = totalPrice - (totalPrice * discountValue / 100);
+                        const roundedPrice = Math.round(discountedPrice / 1000) * 1000;
+                        $('#TongGiaVe').val(roundedPrice);
+                        $('#TongTien').val(formatVND(roundedPrice));
+                        $('#GiaVe').val(formatVND(roundedPrice));
+                    }
+                });
+            }
+        }
+
+        function discountAmount() {
+            var itemId = $('#KhuyenMaiID').val();
+            if (itemId) {
+                $.ajax({
+                    url: '/thong-tin/lich-trinh/giam-gia?id=' + itemId,
+                    method: 'GET',
+                    success: function (data) {
+                        discountValue = parseInt(data);
+                    }
+                });
+            }
+        }
+
+        function displaySeats(param) {
+            if (param == null || param.length == 0) {
+                $('#none').removeClass('d-none').addClass('d-flex');
+                $('#seatContainer').removeClass('d-flex').addClass('d-none');
+                $('#containerFooter').addClass('d-none');
+            } else {
+                $('#none').addClass('d-none').removeClass('d-flex');
+                $('#seatContainer').addClass('d-flex').removeClass('d-none');
+                $('#containerFooter').removeClass('d-none');
+            }
+
+            // Reset lại hiển thị
+            $('#seatContainer #tang-tren .seat-row').empty();
+            $('#seatContainer #tang-duoi .seat-row').empty();
+            $('#seatContainer #bth .seat-row').empty();
+
+            param.forEach(data => {
+                console.log(data);
+                const buttonClass = data.trangThai == "mua" ? 'btn-danger' : 'btn-secondary';
+                const button = $('<button type="button"></button>')
+                    .addClass(`btn ${buttonClass} m-2 col-3 seat`)
+                    .text(data.tenGhe)
+                    .attr('data-gheid', data.gheID)
+                    .on('click', function () {
+                        if ($(this).hasClass('btn-danger')) $(this).toggleClass('removed');
+                        if ($(this).hasClass('btn-secondary')) $(this).toggleClass('selected');
+
+                        const seatID = $(this).attr('data-gheid');
+                        if ($(this).hasClass('selected')) {
+                            if (selectedSeat != null) {
+                                $(this).removeClass('selected');
+                                return;
+                            }
+                            selectedSeat = seatID;
+                        } else if ($(this).hasClass('removed')) {
+                            if (removedSeat != null) {
+                                $(this).removeClass('removed');
+                                return;
+                            }
+                            removedSeat = seatID;
+                        } else {
+                            if ($('.seat.selected').length == 0) selectedSeat = null;
+                            if ($('.seat.removed').length == 0) removedSeat = null;
+                        }
+
+                        checkSelection();
+                    });
+
+                const loaixe = data.xe.loaiXeId;
+                if (loaixe === 'LX001' || loaixe === 'LX003') {
+                    // Cho hiển thị ghế
+                    $('#tang-tren').removeClass('d-none');
+                    $('#tang-duoi').removeClass('d-none');
+                    if (!$('#bth').hasClass('d-none')) $('#bth').addClass('d-none');
+
+                    // Thay đổi chỗ hiện ghế
+                    if (data.tenGhe.charAt(0) === 'B') {
+                        const khuTangTren = $('#seatContainer #tang-tren .seat-row');
+                        khuTangTren.append(button);
+                    } else if (data.tenGhe.charAt(0) === 'A') {
+                        const khuTangDuoi = $('#seatContainer #tang-duoi .seat-row');
+                        khuTangDuoi.append(button);
+                    }
+                } else if (loaixe === 'LX002') {
+                    $('#bth').removeClass('d-none');
+                    if (!$('#tang-tren').hasClass('d-none')) $('#tang-tren').addClass('d-none');
+                    if (!$('#tang-duoi').hasClass('d-none')) $('#tang-duoi').addClass('d-none');
+
+                    const khuGhe = $('#seatContainer #bth .seat-row');
+                    khuGhe.append(button);
+                }
+            });
+        }
+
+        // Ít nhất một cái ghế phải được chọn
+        function checkSelection() {
+            if ($('.seat.selected').length > 0 && $('.seat.removed').length > 0) {
+                $('#nextBtn-2').prop('disabled', false);
+            } else {
+                $('#nextBtn-2').prop('disabled', true);
+            }
+
+            giaTien();
+        }
+
+        // Function to add hidden inputs for selected seats
+        function addHiddenInputs() {
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'GheMoi',
+                value: selectedSeat
+            }).appendTo('#editTicket');
+
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'GheCu',
+                value: removedSeat
+            }).appendTo('#editTicket');
+        }
+
+        $(document).ready(function () {
+            showStep(currentStep);
+
+            // Dành cho bước 1
+            autoFill();
+
+            // Dành cho bước 2
+            checkSelection();
+
+            // Dành cho bước 3
+            $('#LyDo').on('input', function () {
+                const value = $('#LyDo').val().trim(); // Lấy giá trị và loại bỏ khoảng trắng thừa
+                if (value.length > 0) {
+                    $('#nextBtn-3').prop('disabled', false);
+                } else {
+                    $('#nextBtn-3').prop('disabled', true);
+                }
+            });
+
+            // Bước cuối
+            $('#editTicket').on('submit', function () {
+                progressBar.style.width = '100%';
+                progressBar.setAttribute('aria-valuenow', 100);
+
+                addHiddenInputs();
+            });
+        });
+    </script>
+}

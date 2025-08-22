@@ -1,0 +1,111 @@
+﻿@model NhaXeMaiLinh.Models.Data.TaiXe
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 0.75rem;
+        }
+
+        .btn-primary {
+            background-color: #506fe4;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #405dcf;
+            }
+
+        .container {
+            font-family: "Inter", sans-serif;
+        }
+    </style>
+}
+
+<div class="container my-5" style="max-width: 700px;">
+    <h2 class="mb-4 text-center" style="font-size: 20px;">Chi tiết tài xế</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="card m-b-30">
+        <div class="card-body py-5">
+            <form id="taiXeForm" asp-area="Admin" asp-action="Edit" method="post" class="container">
+                @Html.AntiForgeryToken()
+                <div class="form-group row align-items-center">
+                    <label for="TaiXeID" class="col-sm-4 col-form-label">Mã tài xế :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="TaiXeID" name="TaiXeID" value="@Model.TaiXeID" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="HoTen" class="col-sm-4 col-form-label">Họ tên :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="HoTen" name="HoTen" value="@Model.HoTen" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="SDT" class="col-sm-4 col-form-label">Số điện thoại :</label>
+                    <div class="col-sm-8">
+                        <input type="tel" id="SDT" name="SDT" value="@Model.SDT" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="CCCD" class="col-sm-4 col-form-label">CCCD :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="CCCD" name="CCCD" value="@Model.CCCD" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group row align-items-center">
+                    <label for="BangLaiXe" class="col-sm-4 col-form-label">Bằng lái xe :</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="BangLaiXe" name="BangLaiXe" value="@Model.BangLaiXe" class="form-control" readonly />
+                    </div>
+                </div>
+               
+                <div class="text-center">
+                    <button type="button" id="editButton" class="btn btn-primary">Sửa thông tin</button>
+                    <button type="submit" id="saveButton" class="btn btn-success" style="display: none;">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("editButton").addEventListener("click", function () {
+            var inputs = document.querySelectorAll("#taiXeForm input");
+            inputs.forEach(function (input) {
+                if (input.id !== "TaiXeID" && input.id !== "AppUserId") {
+                    input.removeAttribute("readonly");
+                }
+            });
+            document.getElementById("editButton").style.display = "none";
+            document.getElementById("saveButton").style.display = "inline-block";
+        });
+
+        document.getElementById("taiXeForm").addEventListener("submit", function (event) {
+            if (!confirm("Bạn có chắc chắn muốn lưu các thay đổi không?")) {
+                event.preventDefault();
+            }
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

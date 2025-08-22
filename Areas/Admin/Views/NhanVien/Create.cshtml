@@ -1,0 +1,47 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.CreateNhanVienViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        span {
+            z-index: 5;
+        }
+
+        .text-danger {
+            color: red;
+            display: block;
+        }
+    </style>
+}
+<h2 class="mb-4 text-center" style="font-size: 20px;">Thêm nhân viên</h2>
+<form action="/admin/nhanvien/tao-nhan-vien" method="post">
+    @Html.AntiForgeryToken()
+    @if (TempData["SuccessMessage"] != null)
+        {
+        <div class="text-success" style="font-size: 16px;">@TempData["SuccessMessage"]</div>
+    }
+    <div class="form-group">
+        <label asp-for="HoTen">Họ tên</label>
+        <input type="text" id="HoTen" name="HoTen" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.HoTen)</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DiaChi">Địa chỉ</label>
+        <input type="text" id="DiaChi" name="DiaChi" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.DiaChi)</span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email">Nhập email</label>
+        <input type="text" id="Email" name="Email" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.Email)</span>
+    </div>
+    <div class="form-group text-center mt-3">
+        <button type="submit" class="btn btn-primary">Tạo Tài Khoản</button>
+    </div>
+</form>
+@section Scripts {
+    <script>
+   
+    </script>
+}

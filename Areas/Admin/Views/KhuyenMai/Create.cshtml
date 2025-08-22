@@ -1,0 +1,89 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.KhuyenMaiViewModel
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+<div class="container my-5">
+    <h2 class="text-center">Thêm Khuyến Mãi Mới</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <form asp-action="Create" asp-area="Admin" asp-controller="KhuyenMai" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label for="TenKhuyenMai">Tên Khuyến Mãi</label>
+            <input id="TenKhuyenMai" name="TenKhuyenMai" type="text" value="@Model?.TenKhuyenMai" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.TenKhuyenMai)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="LoaiKhuyenMai">Loại Khuyến Mãi</label>
+            <select id="LoaiKhuyenMai" name="LoaiKhuyenMai" class="form-control">
+                <option value="">-- Chọn loại khuyến mãi --</option>
+                <option value="Phần trăm" @(Model?.LoaiKhuyenMai == "Phần trăm" ? "selected" : "")>Phần trăm</option>
+                <option value="Giảm giá cố định" @(Model?.LoaiKhuyenMai == "Giảm giá cố định" ? "selected" : "")>Giảm giá cố định</option>
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.LoaiKhuyenMai)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="NgayBatDau">Ngày Bắt Đầu</label>
+            <input id="NgayBatDau" name="NgayBatDau" type="date" value="@Model?.NgayBatDau.ToString("yyyy-MM-dd")" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.NgayBatDau)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="NgayKetThuc">Ngày Kết Thúc</label>
+            <input id="NgayKetThuc" name="NgayKetThuc" type="date" value="@Model?.NgayKetThuc.ToString("yyyy-MM-dd")" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.NgayKetThuc)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="GiaTriGiam">Giá Trị Giảm</label>
+            <input id="GiaTriGiam" name="GiaTriGiam" type="number" value="@Model?.GiaTriGiam" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GiaTriGiam)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="DieuKienApDung">Điều Kiện Áp Dụng (Tổng giá trị đơn hàng tối thiểu)</label>
+            <input id="DieuKienApDung" name="DieuKienApDung" type="number" value="@Model?.DieuKienApDung" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.DieuKienApDung)</span>
+        </div>
+
+        @* <div class="form-group">
+            <label for="TrangThaiThanhToan">Trạng Thái</label>
+            <select id="TrangThaiThanhToan" name="TrangThaiThanhToan" class="form-control">
+                <option value="">-- Chọn trạng thái --</option>
+                <option value="Kích hoạt" @(Model?.TrangThaiThanhToan == "Kích hoạt" ? "selected" : "")>Kích hoạt</option>
+                <option value="Không kích hoạt" @(Model?.TrangThaiThanhToan == "Không kích hoạt" ? "selected" : "")>Không kích hoạt</option>
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.TrangThaiThanhToan)</span>
+        </div> *@
+
+        <div class="form-group">
+            <label for="TrangThaiThanhToan">Trạng Thái</label>
+            <select id="TrangThaiThanhToan" name="TrangThaiThanhToan" class="form-control">
+                <option value="">-- Chọn trạng thái --</option>
+                <option value="1" @(Model?.TrangThaiThanhToan == "Đang sử dụng" ? "selected" : "")>Đang sử dụng</option>
+                <option value="0" @(Model?.TrangThaiThanhToan == "Không sử dụng" ? "selected" : "")>Không sử dụng</option>
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.TrangThaiThanhToan)</span>
+        </div>
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-success">Lưu</button>
+        </div>
+    </form>
+</div>

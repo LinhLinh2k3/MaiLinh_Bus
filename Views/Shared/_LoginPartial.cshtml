@@ -1,0 +1,68 @@
+﻿﻿@using Microsoft.AspNetCore.Identity;
+@using NhaXeMaiLinh.Models.Data;
+@inject SignInManager<AppUser> signInManager
+@inject UserManager<AppUser> userManager
+<ul class="navbar-nav">
+    @if (signInManager.IsSignedIn(User))
+    {
+        var user = await userManager.GetUserAsync(User);
+        var userName = user?.Name ?? User.Identity!.Name;
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="@Url.Content("~/" + "images/user.svg")"> @userName
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="left: -60%; ">
+                <li>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="UpdateCustomerInfo" style="padding: 5px;">
+                        <i class="fa-solid fa-user-tie"></i> Thông tin tài khoản
+                    </a>
+                </li>
+                @* <li>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="ViewPromotions" style="padding: 5px;">
+                        <img src="@Url.Content("~/images/promo-code.png")" class="w-10">Ưu đãi
+                    </a>
+                </li> *@
+                <li>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="ViewTickets" style="padding: 5px;">
+                        <img src="@Url.Content("~/images/tickets.png")" class="w-10">
+                        Vé của bạn
+                    </a>
+                </li>
+                @* <li>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="TransactionHistory" style="padding: 3px;">
+                        <img src="@Url.Content("~/images/history.png")" class="w-10">
+                        Lịch sử giao dịch
+                    </a>
+                </li> *@
+                <li>
+                    <a class="dropdown-item" href="/lich-su-giao-dich" style="padding: 3px;">
+                        <img src="@Url.Content("~/images/history.png")" class="w-10">
+                        Lịch sử giao dịch
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword" style="padding: 5px;">
+                        <img src="@Url.Content("~/images/refresh.png")" class="w-10">Đổi mật khẩu
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-action="Logout" asp-controller="Account" style="padding: 5px;">
+                      <img src="@Url.Content("~/images/logout.png")" class="w-10">
+                        Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </li>
+    }
+
+    else
+
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">
+                <img src="@Url.Content("~/" + "images/user.svg")">
+            </a>
+        </li>
+    }
+</ul>

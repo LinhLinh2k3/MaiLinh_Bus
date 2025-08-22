@@ -1,0 +1,42 @@
+﻿@using NhaXeMaiLinh.Services
+@model ICollection<NhaXeMaiLinh.Models.Data.LichSuGiaoDich>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Lịch sử giao dịch";
+    Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Mã vé</th>
+            <th>Khách hàng</th>
+            <th>Loại giao dịch</th>
+            <th>Chi tiết</th>
+            <th>Ngày giao dịch</th>
+            <th>Trạng thái giao dịch</th>
+            <th>Nhân viên</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            var i = 1;
+            @foreach (var lsgd in Model) {
+                <tr>
+                    <td>@(i++)</td>
+                    <td>@lsgd.VeXe.VeID</td>
+                    <td>@lsgd.VeXe.KhachHang.HoTen</td>
+                    <td>@(lsgd.LoaiGiaoDich != null ? Generator.Capitalize(lsgd.LoaiGiaoDich) : "Chưa có")</td>
+                    <td>@lsgd.ChiTiet</td>
+                    <td>@lsgd.NgayGiaoDich</td>
+                    <td>@(lsgd.TrangThaiGiaoDich != null ? Generator.Capitalize(lsgd.TrangThaiGiaoDich) : "Chưa có")</td>
+                    <td>@(lsgd.NhanVien != null ? lsgd.NhanVien.HoTen : "Không có")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

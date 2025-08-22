@@ -1,0 +1,47 @@
+﻿@model NhaXeMaiLinh.Areas.Staff.Models.SearchResult
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@if (Model.KhachHangs.Count > 0)
+{
+    @foreach (var kh in Model.KhachHangs)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => kh.HoTen)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => kh.SDT)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => kh.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => kh.CCCD)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => kh.DiaChi)
+            </td>
+            <td class="w-0">
+                <span class="badge rounded-pill text-bg-primary">
+                    @(kh.HangThanhVien == "Member" ? "Thành viên" : kh.HangThanhVien == "Classic" ? "Phổ thông" : kh.HangThanhVien == "VIP" ? "VIP" : "Không có")
+                </span>
+            </td>
+            <td class="d-inline-flex">
+                <a asp-action="Edit" asp-route-id="@kh.KhachHangID">Sửa</a><span class="px-2">|</span>
+                <a asp-action="Details" asp-route-id="@kh.KhachHangID">Chi tiết</a><span class="px-2">|</span>
+                <form asp-action="Delete" asp-route-id="@kh.KhachHangID">
+                    @Html.AntiForgeryToken()
+                    <a href="#" id="show_confirm" data-bs-toggle="modal" data-bs-target="#delModal" data-title="@kh.HoTen">Xóa</a>
+                </form>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="7">
+            <p class="fs-3 fw-bold text-center">Không có dữ liệu :(</p>
+        </td>
+    </tr>
+}

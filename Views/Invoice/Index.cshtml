@@ -1,0 +1,67 @@
+﻿@model NhaXeMaiLinh.ViewModels.InvoiceLookupViewModel
+@{
+    ViewData["Title"] = "Tra cứu hóa đơn";
+    var siteKey = ViewData["ReCaptchaSiteKey"] as string;
+}
+
+<form asp-action="Index" method="post" class="container d-flex flex-column align-items-center pt-5 pb-4 mb-5">
+    <!-- Tiêu đề và mô tả -->
+    <figure class="text-center">
+        <blockquote class="blockquote">
+            <p>TRA CỨU THÔNG TIN HÓA ĐƠN</p>
+        </blockquote>
+        <figcaption class="blockquote-footer">
+            Dễ dàng tìm kiếm thông tin
+        </figcaption>
+    </figure>
+
+    <!-- Nhập mã hóa đơn -->
+    <div class="row mb-3 w-100 justify-content-center">
+        <div class="col-12 col-md-6 d-flex justify-content-center">
+            <label for="InvoiceCode" class="visually-hidden">Mã hóa đơn</label>
+            <input asp-for="InvoiceCode" class="form-control-lg form-control" placeholder="Vui lòng nhập mã hóa đơn" style="border-radius: 15px; max-width: 500px;" required />
+        </div>
+        <span asp-validation-for="InvoiceCode" class="text-danger"></span> <!-- Hiển thị lỗi nếu có -->
+    </div>
+
+    <!-- reCAPTCHA -->
+    <div class="form-group">
+        <div class="g-recaptcha" data-sitekey="@siteKey"></div>
+        <input type="hidden" asp-for="ReCaptchaToken" />
+        <span asp-validation-for="ReCaptchaToken" class="text-danger"></span> <!-- Hiển thị lỗi reCAPTCHA nếu có -->
+    </div>
+
+    <!-- Nút tra cứu -->
+    <div class="d-grid gap-4 col-3">
+        <button class="btn btn-primary" type="submit" style="font-size: 18px; border-radius: 20px;">Tra cứu</button>
+    </div>
+
+    @if (ViewData.ModelState.ErrorCount > 0)
+
+    {
+        <div class="alert alert-danger w-100 text-center mt-3" role="alert">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+
+            {
+                <p><strong>@error.ErrorMessage</strong></p>
+            }
+        </div>
+    }
+
+
+</form>
+
+@section Scripts {
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        $('form').submit(function (event) {
+            var response = grecaptcha.getResponse();
+            if (response.length === 0) {
+                event.preventDefault();
+                alert('Vui lòng hoàn tất reCAPTCHA.');
+            } else {
+                $('input[name="ReCaptchaToken"]').val(response);
+            }
+        });
+    </script>
+}

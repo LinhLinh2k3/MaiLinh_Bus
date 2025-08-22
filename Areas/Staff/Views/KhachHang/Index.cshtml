@@ -1,0 +1,167 @@
+﻿@model NhaXeMaiLinh.Areas.Staff.Models.SearchResult
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Khách hàng";
+    Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Customers manager -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="input-group w-50">
+        <select class="form-select" id="searchType">
+            <option value="" selected>Chọn phương thức tìm kiếm </option>
+            <option value="1">Tìm kiếm theo Tên khách hàng</option>
+            <option value="2">Tìm kiếm theo Số điện thoại</option>
+            <option value="3">Tìm kiếm theo Mã khách hàng</option>
+        </select>
+        <input type="text" id="searchQuery" class="form-control" placeholder="Tim kiếm khách hàng">
+        <button type="button" class="btn btn-primary" id="searchButton">Tìm kiếm</button>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Điện thoại</th>
+            <th>Email</th>
+            <th>CCCD</th>
+            <th>Địa chỉ</th>
+            <th>Hạng thành viên</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider" id="resultsContainer">
+        @await Html.PartialAsync("_dskh", Model)
+    </tbody>
+</table>
+<!-- Pagination -->
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            @if (Model.PageNumber > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link mx-1 rounded" href="@Url.Action("Index", new { page = Model.PageNumber - 1 })">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                        </svg>
+                    </a>
+                </li>
+            }
+
+            @{
+                var startPage = Math.Max(Model.PageNumber - 2, 1);
+                var endPage = Math.Min(startPage + 4, Model.TotalPages);
+                startPage = Math.Max(endPage - 4, 1);
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                    <a class="page-link mx-1 rounded" href="@Url.Action("Index", new { page = i })">@i</a>
+                </li>
+            }
+
+            @if (Model.PageNumber < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link mx-1 rounded" href="@Url.Action("Index", new { page = Model.PageNumber + 1 })">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+<!-- Modal -->
+<div class="modal fade" id="delModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Cảnh báo!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center fs-4 fw-bold mbodyTitle">Bạn có chắc xóa người dùng này không?</p>
+                <p class="text-center fs-5 font-monospace mbodyContent"></p>
+                <p class="text-center fs-6 fst-italic mbodyFooter">Bạn sẽ không hoàn tác lại được!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-confirm">Có</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).on('click', 'a#show_confirm', function(event) {
+            event.preventDefault();
+
+            var form = $(this).closest("form");
+            var name = $(this).data('title');
+
+            var delModal = document.getElementById("delModal");
+            delModal.style.display = "block";
+
+            var modalBodyContent = delModal.querySelector('.modal-body .mbodyContent');
+            modalBodyContent.textContent = name;
+
+            $('.btn-confirm').off('click').on('click', function(e) {
+                e.preventDefault();
+                try {
+                    form.submit();
+                } catch (err) {
+                    HTMLFormElement.prototype.submit.call(form);
+                }
+            });
+        });
+
+        function fetchTimKiem() {
+            var searchType = $('#searchType').val();
+            var searchQuery = $('#searchQuery').val();
+
+            if (!searchType || !searchQuery) {
+                alert("Vui lòng chọn phương thức và nhập từ khóa tìm kiếm.");
+                return;
+            }
+
+            $.ajax({
+                url: '/staff/khach-hang/tim-kiem',
+                type: 'GET',
+                data: {
+                    searchType: searchType,
+                    searchQuery: searchQuery,
+                    pageNumber: 1,
+                    pageSize: 10
+                },
+                success: function (result) {
+                    $('#resultsContainer').html(result);
+                },
+                error: function () {
+                    alert("Đã xảy ra lỗi trong quá trình tìm kiếm.");
+                }
+            });
+        }
+
+        // Nhấn nút tìm kiếm
+        $('#searchButton').on('click', function () {
+            fetchTimKiem();
+        });
+
+        // Nhập trong thanh tìm kiếm và bấm "Enter"
+        $('#searchQuery').on('keypress', function (e) {
+            if (e.which === 13) {
+                fetchTimKiem();
+            }
+        });
+    </script>
+}

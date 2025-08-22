@@ -1,0 +1,63 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.XeViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Chi tiết xe</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="Edit" asp-controller="Vehicle" asp-area="Admin" method="post" class="form" id="editForm">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label>Biển số</label>
+            <input type="text" name="BienSo" class="form-control" value="@Model.BienSo" readonly />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.BienSo)</span>
+        </div>
+
+        <div class="form-group">
+            <label>Loại xe</label>
+            <select name="LoaiXeId" class="form-control" disabled>
+                <option value="">-- Chọn loại xe --</option>
+                @foreach (var loaiXe in Model.LoaiXes)
+                {
+                    <option value="@loaiXe.LoaiXeID" @(Model.LoaiXeId == loaiXe.LoaiXeID ? "selected" : "")>@loaiXe.TenLoaiXe</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.LoaiXeId)</span>
+        </div>
+
+        <div class="form-group">
+            <label>Tình trạng</label>
+            <input type="text" name="TinhTrang" class="form-control" value="@Model.TinhTrang" readonly />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.TinhTrang)</span>
+        </div>
+
+        <div class="text-center">
+            <button type="button" id="editButton" class="btn btn-warning mt-3">Sửa thông tin</button>
+            <button type="submit" id="saveButton" class="btn btn-primary mt-3" style="display: none;" onclick="return confirm('Bạn có chắc chắn muốn lưu thay đổi?')">Lưu</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("editButton").addEventListener("click", function() {
+            // Bật cho phép chỉnh sửa
+            document.querySelector('input[name="BienSo"]').readOnly = false;
+            document.querySelector('select[name="LoaiXeId"]').disabled = false;
+            document.querySelector('input[name="TinhTrang"]').readOnly = false;
+
+            // Ẩn nút "Sửa thông tin" và hiển thị nút "Lưu"
+            document.getElementById("editButton").style.display = "none";
+            document.getElementById("saveButton").style.display = "inline-block";
+        });
+    </script>
+}

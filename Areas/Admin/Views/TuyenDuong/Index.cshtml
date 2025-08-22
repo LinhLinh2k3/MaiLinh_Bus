@@ -1,0 +1,105 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.TuyenDuong>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+@section Style {
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar .navbar-text {
+            color: white;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+}
+<div class="container">
+    <!-- Display success or error messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Danh sách tuyến đường</h4>
+        <div class="form-group">
+            <select id="statusFilter" class="form-control" onchange="filterTuyenDuong()">
+                <option value="/admin/tuyenduong/danh-sach-tuyen-duong" selected>Đang hoạt động</option>
+                <option value="/admin/tuyen-duong/danh-sach-da-xoa">Đã xóa</option>
+            </select>
+
+        </div>
+        <a href="@Url.Action("Create", "TuyenDuong", new { area = "Admin" })" class="btn btn-primary">Tạo mới một tuyến đường</a>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã tuyến đường</th>
+                <th>Tên tuyến đường</th>
+                <th>Điểm đi</th>
+                <th>Điểm đến</th>
+                <th>Quãng đường</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TuyenDuongID</td>
+                    <td>@item.TenTuyenDuong</td>
+                    <td>@item.DiemDi</td>
+                    <td>@item.DiemDen</td>
+                    <td>@item.QuangDuong</td>
+                    <td class="action-buttons">
+                        <a href="@Url.Content("/chi-tiet-tuyen-duong/" + item.TuyenDuongID)" class="btn btn-success btn-sm">Chi tiết</a>
+                        <form action="@Url.Action("Delete", new { id = item.TuyenDuongID })" method="post" class="d-inline" onsubmit="confirmDelete(event)">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(event) {
+            if (!confirm('Bạn có chắc chắn muốn xóa tuyến đường này?')) {
+                event.preventDefault();
+            }
+        }
+        function filterTuyenDuong() {
+            var selectedValue = document.getElementById('statusFilter').value;
+            window.location.href = selectedValue;
+        }
+    </script>
+}

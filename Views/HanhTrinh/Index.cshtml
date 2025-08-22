@@ -1,0 +1,641 @@
+﻿@model IEnumerable<NhaXeMaiLinh.Models.Data.LichTrinh>
+
+@* Kr tra ng dung dang nhap hay khum *@
+@using Microsoft.AspNetCore.Identity
+@using NhaXeMaiLinh.Models.Data
+@inject SignInManager<AppUser> SignInManager
+
+<div class="container-lg rounded mt-4" style="border-radius: 10px;">
+    <div class="row d-flex justify-content-center">
+        <!-- Điểm đi -->
+        <div class="col-md-5">
+            <input type="search" id="diemDiInput" class="form-control" placeholder="Chọn điểm đi">
+        </div>
+
+        <div class="col-md-1 text-center">
+            <img id="switchBtn" class="img-fluid" src="~/images/transfer.png" width="50px" style="cursor: pointer;">
+        </div>
+
+        <!-- Điểm đến -->
+        <div class="col-md-5">
+            <input type="search" id="diemDenInput" class="form-control" placeholder="Chọn điểm đến" />
+        </div>
+        
+    </div>
+</div>
+
+<!-- Phần bộ lọc tìm kiếm -->
+<div class="row d-flex justify-content-center mt-4">
+   
+     <!-- Ngày đi -->
+     <div class="col-md-2">
+            <input type="date" id="ngayKhoiHanh" name="date" class="form-control" placeholder="Ngày đi" class="col-md-2" style="height: 40px;"/>
+        </div> 
+         <!-- Dropdown Loại xe -->
+    <div class="col-md-2">
+        <select id="loaiXeDropdown" class="form-select">
+            <option selected>Chọn loại xe</option>
+            <option value="Xe Giường Nằm">Xe Giường Nằm</option>
+            <option value="Xe Ghế Ngồi">Xe Ghế Ngồi</option>
+            <option value="Xe Limousine">Xe Limousine</option>
+        </select>
+    </div>
+
+    <!-- Dropdown Giờ đi -->
+    <div class="col-md-2">
+        <select id="gioDiDropdown" class="form-select">
+            <option selected>Chọn giờ đi</option>
+            <option value="00:00-06:00">Buổi sáng 00:00 - 06:00</option>
+            <option value="06:00-12:00">Buổi sáng 06:00 - 12:00</option>
+            <option value="12:00-18:00">Buổi chiều 12:00 - 18:00</option>
+            <option value="18:00-23:59">Buổi tối 18:00 - 23:59</option>
+        </select>
+    </div>
+    <div class="col-md-2 ">
+		<input type="number" value="1"  class="form-control" placeholder="Nhập số vé" step="1" style="height: 40px;" id="soLuongGhe"/>  
+	</div>
+
+    <!-- Nút tìm kiếm -->
+    <div class="col-md-2 ">
+        <button id="searchBtn" class="btn btn-primary w-100">Tìm kiếm</button>
+    </div>
+</div>
+
+
+
+<!-- Bảng kết quả -->
+<div class="container col-md-12 col-lg-11 fs-6 text-primary mt-4 mb-5 d-none"
+    style="border-radius: 15px;border: 1px solid rgb(180,176,176);" id="lichTrinhTable">
+    @await Html.PartialAsync("_LichTrinhTable", Model)
+</div>
+<!-- Thanh thông báo khi chọn đủ 5 ghế -->
+<div class="toast-message mx-auto d-none" id="toastMessage">
+    <div class="toast-message__content">
+        Đã chọn đủ số ghế!
+    </div>
+    <button class="toast-close-btn" onclick="hideToastMessage()">×</button>
+</div>
+
+@section Scripts{
+    <script>
+        let soLuongGhe = 0;
+        let soGheDaChon = 0;
+        let tenGheDaChon = [];
+        let IDGheDaChon = [];
+
+        function chonGhe(id) {
+            let selectedSeats = [];
+            const selectedDivs = document.querySelectorAll(`tr#details-${id} div.seat.available.selected`);
+            const ticketPriceElement = $(`button.toggle-details[data-id="${id}"]`);
+            const ticketPrice = parseInt(ticketPriceElement.attr('data-gia-ve'));
+
+            if (selectedDivs.length > 0) {
+                selectedSeats = Array.from(selectedDivs).map(div => {
+                    return div.textContent;
+                });
+
+                $.ajax({
+                    url: '/HanhTrinh/SaveSeats',
+                    type: 'POST',
+                    contentType: 'application/json', // Đảm bảo gửi dữ liệu dưới dạng JSON
+                    data: JSON.stringify({ 
+                        GiaTien: ticketPrice * selectedSeats.length,
+                        seats: selectedSeats,
+                        IDseats: IDGheDaChon,
+                        lichTrinhId: id 
+                    }),
+                    success: function (response) {
+                        location.href = '/thanh-toan';
+                    },
+                    error: function () {
+                        alert("Đã có lỗi xảy ra khi gửi danh sách ghế.");
+                    }
+                });
+            } else {
+                alert("Vui lòng chọn ít nhất một ghế!");
+            }
+        }
+
+        // Hàm gắn sự kiện nhấp chuột vào các nút "Chi tiết"
+        function attachDetailToggleEvents() {
+            document.querySelectorAll('.toggle-details').forEach(button => {
+                button.addEventListener('click', function () {
+                    var id = this.getAttribute('data-id');
+                    var giaVe = parseInt(this.getAttribute('data-gia-ve')); // Lấy giá vé
+                    var loaiXe = this.getAttribute('data-loai-xe'); // Lấy loại xe
+                    var detailsRow = document.getElementById('details-' + id);
+
+                    if (giaVe > 0) {
+                        $.ajax({
+                            url: '/thong-tin/ghe?id=' + id,
+                            method: 'GET',
+                            success: function(data) {
+                                $(detailsRow.querySelector('.tang-tren #tangtren')).empty();
+                                $(detailsRow.querySelector('.tang-duoi #tangduoi')).empty();
+
+                                let seatRow = $('<div class="seat-row"></div>');
+                                let UseatRow = $('<div class="seat-row"></div>');
+                                let DseatRow = $('<div class="seat-row"></div>');
+                                let upperCount = 0, downCount = 0;
+
+                                data.forEach((ghe, index) => {
+                                    // Nếu là "Xe Ghế Ngồi", chỉ hiển thị tầng dưới
+                                    var loaiXeId = ghe.xe.loaiXeId
+                                    if (loaiXeId === 'LX002' || loaiXe === "Xe Ghế Ngồi") {
+                                        detailsRow.querySelector('.tang-tren').style.display = 'none'; // Ẩn tầng trên
+                                        detailsRow.querySelector('.tang-duoi').style.display = 'block'; // Hiển thị tầng dưới
+
+                                        var tenGhe = ghe.tenGhe;
+                                        const div = $(`<div class="seat">${tenGhe}</div>`)
+                                            .on('click', function() {
+                                                if ($(this).hasClass('unavailable')) {
+                                                    return;
+                                                } else if ($(this).hasClass('available')) {
+                                                    if ($(this).hasClass('selected')) {
+                                                        $(this).removeClass('selected');
+                                                        soGheDaChon--;
+                                                        tenGheDaChon = tenGheDaChon.filter(g => g !== tenGhe);
+                                                        IDGheDaChon = IDGheDaChon.filter(g => g !== ghe.gheID);
+                                                    } else {
+                                                        $(this).addClass('selected');
+                                                        soGheDaChon++;
+                                                        tenGheDaChon.push(tenGhe);
+                                                        IDGheDaChon.push(ghe.gheID);
+                                                    }
+                                                }
+                                              
+                                                soLuongGhe = document.getElementById("soLuongGhe").value;
+                                                if (soLuongGhe > soGheDaChon) {
+                                                    alert("Bạn chưa mua đủ vé! Bạn có muốn tiếp tục?");
+                                                }
+
+                                                if (soGheDaChon >= 5) {
+                                                    showToastMessage();
+                                                    $(this).removeClass('selected');
+                                                    soGheDaChon--;
+                                                    xtenGheDaChon = tenGheDaChon.filter(g => g !== tenGhe);
+                                                    return;
+                                                }
+
+                                                // Lấy giá vé từ thuộc tính data-gia-ve trong nút "Chi tiết" của lịch trình tương ứng
+                                                const ticketPriceElement = detailsRow.previousElementSibling.querySelector('.toggle-details');
+                                                const ticketPrice = parseInt(ticketPriceElement.getAttribute('data-gia-ve'));
+
+                                                // Cập nhật thông tin ghế đã chọn cho lịch trình tương ứng
+                                                updateSelectedSeatsInfo(detailsRow, tenGheDaChon, ticketPrice);
+                                            });
+
+                                        if (ghe.trangThai === 'mua') {
+                                            div.addClass('unavailable');
+                                        } else {
+                                            div.addClass('available');
+                                        }
+
+                                        seatRow.append(div);
+                                        if ((index + 1) % 3 === 0 || index === data.length - 1) {
+                                            $(`#details-${id} .tang-duoi #tangduoi`).append(seatRow);
+                                            seatRow = $('<div class="seat-row"></div>');
+                                        }
+                                    } else {
+                                        // Hiển thị cả tầng trên và tầng dưới cho các loại xe khác
+                                        detailsRow.querySelector('.tang-tren').style.display = 'block';
+                                        detailsRow.querySelector('.tang-duoi').style.display = 'block';
+
+                                        if (ghe.tenGhe.charAt(0) === 'B') {
+                                            var tenGhe = ghe.tenGhe;
+                                            const div = $(`<div class="seat">${tenGhe}</div>`)
+                                                .on('click', function() {
+                                                    if ($(this).hasClass('unavailable')) {
+                                                        return;
+                                                    } else if ($(this).hasClass('available')) {
+                                                        if ($(this).hasClass('selected')) {
+                                                            $(this).removeClass('selected');
+                                                            soGheDaChon--;
+                                                            tenGheDaChon = tenGheDaChon.filter(g => g !== tenGhe);
+                                                            IDGheDaChon = IDGheDaChon.filter(g => g !== ghe.gheID);
+                                                        } else {
+                                                            $(this).addClass('selected');
+                                                            soGheDaChon++;
+                                                            tenGheDaChon.push(tenGhe);
+                                                            IDGheDaChon.push(ghe.gheID);
+                                                        }
+                                                    }
+                                                    
+                                                    soLuongGhe = document.getElementById("soLuongGhe").value;
+                                                    if (soLuongGhe > soGheDaChon) {
+                                                        alert("Bạn chưa mua đủ vé! Bạn có muốn tiếp tục?");
+                                                    }
+
+                                                    if (soGheDaChon >= 5) {
+                                                        showToastMessage();
+                                                        $(this).removeClass('selected');
+                                                        soGheDaChon--;
+                                                        tenGheDaChon = tenGheDaChon.filter(g => g !== tenGhe);
+                                                        return;
+                                                    }
+
+                                                    // Lấy giá vé từ thuộc tính data-gia-ve trong nút "Chi tiết" của lịch trình tương ứng
+                                                    const ticketPriceElement = detailsRow.previousElementSibling.querySelector('.toggle-details');
+                                                    const ticketPrice = parseInt(ticketPriceElement.getAttribute('data-gia-ve'));
+
+                                                    // Cập nhật thông tin ghế đã chọn cho lịch trình tương ứng
+                                                    updateSelectedSeatsInfo(detailsRow, tenGheDaChon, ticketPrice);
+                                                });
+
+                                            if (ghe.trangThai === 'mua') {
+                                                div.addClass('unavailable');
+                                            } else {
+                                                div.addClass('available');
+                                            }
+
+                                            UseatRow.append(div);
+                                            upperCount++;
+
+                                            if (upperCount % 3 === 0 || index === data.length - 1 || data[index + 1].tenGhe.charAt(0) !=='B') {
+                                                $(`#details-${id} .tang-tren #tangtren`).append(UseatRow);
+                                                UseatRow = $('<div class="seat-row"></div>');
+                                            }
+                                        } else if (ghe.tenGhe.charAt(0) === 'A') {
+                                            var tenGhe = ghe.tenGhe;
+                                            const div = $(`<div class="seat">${tenGhe}</div>`)
+                                                .on('click', function() {
+                                                    if ($(this).hasClass('unavailable')) {
+                                                        return;
+                                                    } else if ($(this).hasClass('available')) {
+                                                        if ($(this).hasClass('selected')) {
+                                                            $(this).removeClass('selected');
+                                                            soGheDaChon--;
+                                                            tenGheDaChon = tenGheDaChon.filter(g => g !== tenGhe);
+                                                            IDGheDaChon = IDGheDaChon.filter(g => g !== ghe.gheID);
+                                                        } else {
+                                                            $(this).addClass('selected');
+                                                            soGheDaChon++;
+                                                            tenGheDaChon.push(tenGhe);
+                                                            IDGheDaChon.push(ghe.gheID);
+                                                        }
+                                                    }
+                                                    
+                                                    soLuongGhe = document.getElementById("soLuongGhe").value;
+                                                    if (soLuongGhe > soGheDaChon) {
+                                                        alert("Bạn chưa mua đủ vé! Bạn có muốn tiếp tục?");
+                                                    }
+                                                  
+                                                    if (soGheDaChon >= 5) {
+                                                        showToastMessage();
+                                                        $(this).removeClass('selected');
+                                                        soGheDaChon--;
+                                                        tenGheDaChon = tenGheDaChon.filter(g => g !== tenGhe);
+                                                        return;
+                                                    }
+
+                                                    // Lấy giá vé từ thuộc tính data-gia-ve trong nút "Chi tiết" của lịch trình tương ứng
+                                                    const ticketPriceElement = detailsRow.previousElementSibling.querySelector('.toggle-details');
+                                                    const ticketPrice = parseInt(ticketPriceElement.getAttribute('data-gia-ve'));
+
+                                                    // Cập nhật thông tin ghế đã chọn cho lịch trình tương ứng
+                                                    updateSelectedSeatsInfo(detailsRow, tenGheDaChon, ticketPrice);
+                                                });
+
+                                            if (ghe.trangThai === 'mua') {
+                                                div.addClass('unavailable');
+                                            } else {
+                                                div.addClass('available');
+                                            }
+
+                                            DseatRow.append(div);
+                                            downCount++;
+
+                                            if (downCount % 3 === 0 || index === data.length - 1 || data[index + 1].tenGhe.charAt(0) !=='A') {
+                                                $(`#details-${id} .tang-duoi #tangduoi`).append(DseatRow);
+                                                DseatRow = $('<div class="seat-row"></div>');
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        });
+
+                        if (detailsRow.style.display === 'none' || detailsRow.style.display === '') {
+                            detailsRow.style.display = 'table-row'; // Hiển thị chi tiết
+                        } else {
+                            detailsRow.style.display = 'none'; // Ẩn chi tiết
+                        }
+                    } else {
+                        loadNoResultMessage(detailsRow);
+                    }
+                });
+            });
+        }
+
+        function loadNoResultMessage(detailsRow) {
+            $.ajax({
+                url: '/HanhTrinh/NoResultMessage', // Tạo một action trong controller để trả về view KetQuaTimKiem
+                type: 'GET',
+                success: function (result) {
+                    // Thay thế nội dung của hàng chi tiết bằng thông báo từ view KetQuaTimKiem
+                    $(detailsRow).html(result);
+                    $(detailsRow).show(); // Hiển thị hàng chi tiết với thông báo
+                },
+                error: function () {
+                    alert("Đã có lỗi xảy ra khi tải thông báo.");
+                }
+            });
+        }
+
+        // Hàm hoán đổi điểm đi và điểm đến
+        function swapLocations() {
+            document.getElementById("switchBtn").setAttribute("disabled", "disabled");
+            var diemDiInput = document.getElementById("diemDiInput");
+            var diemDenInput = document.getElementById("diemDenInput");
+
+            // Hoán đổi giá trị giữa hai ô nhập
+            var temp = diemDiInput.value;
+            diemDiInput.value = diemDenInput.value;
+            diemDenInput.value = temp;
+
+            // Cập nhật bảng lịch trình sau khi hoán đổi
+            filterLichTrinh();
+            setTimeout(function () {
+                document.getElementById("switchBtn").removeAttribute("disabled");
+            }, 500);
+        }
+
+        // Gắn sự kiện nhấp chuột cho nút "Hoán đổi"
+        document.getElementById("switchBtn").addEventListener("click", swapLocations);
+
+        // Hàm gửi yêu cầu AJAX và lọc lịch trình
+        $(document).ready(function () {
+            // Gắn sự kiện click cho các nút hoặc phần tử tương ứng để mở/đóng chi tiết
+            $('.toggle-details').on('click', function () {
+                var id = $(this).data('id');
+                $('.details-row').each(function() {
+                    $(this).css('display', 'none'); // Ẩn tất cả các hàng chi tiết
+                });
+                var detailsRow = $('#details-' + id);  
+                if (detailsRow.css('display') == 'none') {
+                    detailsRow.css('display', 'table-row'); // Hiển thị hàng chi tiết mới
+                } else {
+                    detailsRow.css('display', 'none'); // Ẩn hàng chi tiết nếu đã mở
+                }
+            });
+        });
+
+        // Hàm cập nhật thông tin ghế đã chọn và tính tổng tiền cho từng lịch trình cụ thể
+        function updateSelectedSeatsInfo(detailsRow, selectedSeats, ticketPrice) {
+            const selectedSeatsInfo = detailsRow.querySelector('#selectedSeatsInfo');
+            const seatCountText = selectedSeatsInfo.querySelector('#seatCountText');
+            const totalPriceText = selectedSeatsInfo.querySelector('#totalPriceText');
+
+            if (selectedSeats.length > 0) {
+                seatCountText.textContent = `${selectedSeats.length} Vé`;
+                totalPriceText.textContent = (selectedSeats.length * ticketPrice).toLocaleString('vi-VN') + 'đ';
+                selectedSeatsInfo.style.display = 'flex';  // Hiển thị phần thông tin ghế đã chọn
+            } else {
+                selectedSeatsInfo.style.display = 'none';  // Ẩn phần thông tin nếu không có ghế nào được chọn
+            }
+        }
+
+
+        // Hiển thị thông báo khi chọn đủ số ghế
+        function showToastMessage() {
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastMessage.classList.remove('d-none');
+
+            // Ẩn thông báo sau 3 giây
+            setTimeout(function () {
+                hideToastMessage();
+            }, 3000);
+        }
+
+        function hideToastMessage() {
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.classList.add('d-none');
+        }
+
+        // Khởi tạo sự kiện chọn ghế và xử lý khi trang được tải
+        document.addEventListener('DOMContentLoaded', function () {
+            attachDetailToggleEvents();
+        });
+
+        // Hàm gửi yêu cầu AJAX khi nhấn nút "Tìm kiếm"
+        document.getElementById("searchBtn").addEventListener("click", function () {
+            if ($('#lichTrinhTable').hasClass('d-none')) $('#lichTrinhTable').removeClass('d-none'); // Co thi pp
+
+            var diemDi = document.getElementById("diemDiInput").value.trim();
+            var diemDen = document.getElementById("diemDenInput").value.trim();
+            var loaiXe = document.getElementById("loaiXeDropdown").value;
+            var gioDi = document.getElementById("gioDiDropdown").value;
+            var ngayKhoiHanh = document.getElementById("ngayKhoiHanh").value; // Lấy giá trị ngày khởi hành
+            // Gửi yêu cầu lọc lịch trình với các tham số
+            $.ajax({
+                url: '/HanhTrinh/Filter',
+                type: 'GET',
+                data: { diemDi: diemDi, diemDen: diemDen, loaiXe: loaiXe, gioKhoiHanh: gioDi, ngayKhoiHanh: ngayKhoiHanh },
+                success: function (result) {
+                    // Cập nhật bảng kết quả
+                    $('#lichTrinhTable').html(result);
+                    attachDetailToggleEvents(); // Gắn lại các sự kiện sau khi cập nhật kết quả
+                },
+                error: function () {
+                    alert("Đã có lỗi xảy ra. Vui lòng thử lại.");
+                }
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+}
+
+
+@section Style {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .toast-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #F4511E;
+            /* Màu giống như trước */
+            color: #fff;
+            padding: 30px 40px;
+            /* Tăng thêm padding */
+            border-radius: 8px;
+            /* Cạnh tròn hơn */
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            /* Bóng đổ mạnh hơn */
+            font-size: 22px;
+            /* Kích thước font chữ lớn hơn */
+        }
+
+        .toast-message.visible {
+            opacity: 1;
+            transform: translateY(-15px);
+            /* Hiệu ứng trượt lên mượt mà */
+        }
+
+        .toast-message.hidden {
+            opacity: 0;
+            transform: translateY(15px);
+            /* Trượt xuống khi ẩn */
+        }
+
+        .toast-message__content {
+            font-size: 22px;
+            /* Tăng kích thước font chữ */
+            font-weight: bold;
+            flex-grow: 1;
+        }
+
+        /* Kiểu nút đóng */
+        .toast-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 26px;
+            /* Tăng kích thước cho nút đóng */
+            cursor: pointer;
+            margin-left: 20px;
+            /* Tăng khoảng cách */
+        }
+
+        .seat {
+            width: 50px;
+            height: 50px;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px;
+        }
+
+        .sold {
+            background-color: #bdbdbd;
+            /* Màu đã bán */
+        }
+
+        .available {
+            background-color: #e3f2fd;
+            /* Màu còn trống */
+        }
+
+        .selected {
+            background-color: #fee2e2;
+            /* Màu đang chọn */
+        }
+
+        .seat-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .legend {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        /* Đặt kích thước cho bảng ghế */
+        .seat-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            /* Khoảng cách giữa các ghế */
+            max-width: 600px;
+            /* Giới hạn chiều rộng của bảng ghế */
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* Định dạng các ô ghế */
+        .seat-selection button {
+            width: 50px;
+            /* Chiều rộng của ghế */
+            height: 50px;
+            /* Chiều cao của ghế */
+            background-color: #e0efff;
+            /* Màu ghế còn trống */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Ghế đã bán */
+        .seat-selection button.sold {
+            background-color: #f8d7da;
+            color: #a94442;
+            cursor: not-allowed;
+        }
+
+        /* Ghế đang chọn */
+        .seat-selection button.selected {
+            background-color: #ff5a00;
+            color: white;
+        }
+
+        /* Phần hiển thị thông tin ghế đã chọn */
+        #selectedSeatsInfo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            /* Chỉnh thành 100% để bảng giãn theo chiều ngang */
+            max-width: 1000px;
+            /* Bạn có thể chỉnh giá trị này theo mong muốn */
+            margin: 0 auto;
+            font-size: 1rem;
+        }
+
+
+        #selectedSeatsInfo .text-[#4A4A4A] {
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        #selectedSeatsInfo .text-black {
+            margin-left: 10px;
+            font-size: 1em;
+            color: #666;
+        }
+
+        #selectedSeatsInfo .text-right {
+            font-size: 1.2em;
+        }
+
+        #selectedSeatsInfo .text-orange {
+            color: #ff5a00;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Nút chọn */
+        #selectedSeatsInfo button#selectButton {
+            padding: 10px 20px;
+            background-color: #ff5a00;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #selectedSeatsInfo button#selectButton:hover {
+            background-color: #e14e00;
+        }
+    </style>
+}

@@ -1,0 +1,150 @@
+﻿@model NhaXeMaiLinh.Areas.Admin.ViewModels.LichTrinhViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_dashboard.cshtml";
+}
+<div class="container my-5">
+    <h2>Thêm Lịch Trình Mới</h2>
+    <form asp-action="Create" asp-area="Admin" asp-controller="Route" method="post" class="col-10">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label asp-for="XeId">Chọn Xe</label>
+            <select id="XeId" name="XeId" class="form-control" aria-label="Chọn xe">
+                <option value="">-- Chọn xe --</option>
+                @foreach (var xe in Model.DanhSachXe)
+                {
+                    <option value="@xe.XeID" @(xe.XeID == Model.XeId ? "selected" : "")>@xe.BienSo</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.XeId)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TuyenDuongId">Chọn Tuyến Đường</label>
+            <select id="TuyenDuongId" name="TuyenDuongId" class="form-control" aria-label="Chọn tuyến đường">
+                <option value="">-- Chọn tuyến đường --</option>
+                @foreach (var td in Model.DanhSachTuyenDuong)
+                {
+                    <option value="@td.TuyenDuongID" @(td.TuyenDuongID == Model.TuyenDuongId ? "selected" : "")>@td.TenTuyenDuong</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.TuyenDuongId)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GioKhoiHanh">Giờ Khởi Hành</label>
+            <input id="GioKhoiHanh" name="GioKhoiHanh" type="time" class="form-control" value="@Model.GioKhoiHanh" placeholder="Chọn giờ khởi hành" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GioKhoiHanh)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GioDen">Giờ Đến</label>
+            <input id="GioDen" name="GioDen" type="time" class="form-control" value="@Model.GioDen" placeholder="Chọn giờ đến" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GioDen)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NgayKhoiHanh">Ngày Khởi Hành</label>
+            <input id="NgayKhoiHanh" name="NgayKhoiHanh" type="date" class="form-control" value="@Model.NgayKhoiHanh" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.NgayKhoiHanh)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NgayDen">Ngày Đến</label>
+            <input id="NgayDen" name="NgayDen" type="date" class="form-control" value="@Model.NgayDen" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.NgayDen)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GiaVe">Giá Vé</label>
+            <input id="GiaVe" name="GiaVe" type="number" class="form-control" value="@Model.GiaVe" min="0" placeholder="Nhập giá vé" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GiaVe)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DieuChinhGiaVe">Điều Chỉnh Giá Vé</label>
+            <input id="DieuChinhGiaVe" name="DieuChinhGiaVe" type="number" class="form-control" value="@Model.DieuChinhGiaVe" min="0" placeholder="Nhập điều chỉnh giá vé" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.DieuChinhGiaVe)</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3 text-center">Thêm Lịch Trình</button>
+    </form>
+</div>
+
+@* <div class="container my-5">
+    <h2>Thêm Lịch Trình Mới</h2>
+    <form asp-action="Create" asp-area="Admin" asp-controller="Route" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label asp-for="XeId">Chọn Xe</label>
+            <select id="XeId" name="XeId" class="form-control">
+                <option value="">-- Chọn xe --</option>
+                @foreach (var xe in Model.DanhSachXe)
+                {
+                    <option value="@xe.XeID">@xe.BienSo</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.XeId)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TuyenDuongId">Chọn Tuyến Đường</label>
+            <select id="TuyenDuongId" name="TuyenDuongId" class="form-control">
+                <option value="">-- Chọn tuyến đường --</option>
+                @foreach (var td in Model.DanhSachTuyenDuong)
+                {
+                    <option value="@td.TuyenDuongID">@td.TenTuyenDuong</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.TuyenDuongId)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GioKhoiHanh">Giờ Khởi Hành</label>
+            <input id="GioKhoiHanh" name="GioKhoiHanh" type="time" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GioKhoiHanh)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GioDen">Giờ Đến</label>
+            <input id="GioDen" name="GioDen" type="time" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GioDen)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NgayKhoiHanh">Ngày Khởi Hành</label>
+            <input id="NgayKhoiHanh" name="NgayKhoiHanh" type="date" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.NgayKhoiHanh)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NgayDen">Ngày Đến</label>
+            <input id="NgayDen" name="NgayDen" type="date" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.NgayDen)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GiaVe">Giá Vé</label>
+            <input id="GiaVe" name="GiaVe" type="number" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.GiaVe)</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DieuChinhGiaVe">Điều Chỉnh Giá Vé</label>
+            <input id="DieuChinhGiaVe" name="DieuChinhGiaVe" type="number" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.DieuChinhGiaVe)</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Thêm Lịch Trình</button>
+    </form>
+</div> *@
+@section Scripts {
+<script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+        if (!confirm("Bạn có chắc chắn muốn thêm lịch trình này?")) {
+            e.preventDefault();
+        }
+    });
+</script>
+}

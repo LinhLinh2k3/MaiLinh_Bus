@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vé xe đặt thành công</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        h2 { color: #2c3e50; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 10px; text-align: left; }
+        th { background-color: #f5f5f5; }
+        .button { text-align: center; margin: 20px 0; }
+        .button a { background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Vé xe đặt thành công</h2>
+        <p>Xin chào <strong>{{TenKhachHang}}</strong>,</p>
+        <p>Cảm ơn bạn đã đặt vé tại <strong>Nhà Xe Mai Linh</strong>. Dưới đây là thông tin chi tiết về vé của bạn:</p>
+        
+        <table>
+            <tr>
+                <th>Mã đặt vé</th>
+                <td>{{MaVe}}</td>
+            </tr>
+            <tr>
+                <th>Mã giao dịch</th>
+                <td>{{MaGiaoDich}}</td>
+            </tr>
+            <tr>
+                <th>Tuyến đường</th>
+                <td>{{TenTuyenDuong}}</td>
+            </tr>
+            <tr>
+                <th>Ngày & Giờ khởi hành</th>
+                <td>{{NgayKhoiHanh}}, {{GioKhoiHanh}}</td>
+            </tr>
+            <tr>
+                <th>Số ghế</th>
+                <td>{{GheChon}}</td>
+            </tr>
+            <tr>
+                <th>Tổng tiền</th>
+                <td>{{TongTien}} VNĐ</td>
+            </tr>
+            <tr>
+                <th>Hình thức thanh toán</th>
+                <td>{{PhuongThucThanhToan}}</td>
+            </tr>
+        </table>
+
+        <div class="button">
+            <a href="{{LinkChiTiet}}">Xem chi tiết vé</a>
+        </div>
+
+        <p>
+            Quý khách vui lòng xuất trình email này khi lên xe. Mọi thắc mắc xin liên hệ: <br>
+            <strong>Hotline:</strong> 1900 6067 | <strong>Email:</strong> hotro@mailinh.vn
+        </p>
+
+        <div class="footer">
+            <p>© 2024 NhaXeMaiLinh. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

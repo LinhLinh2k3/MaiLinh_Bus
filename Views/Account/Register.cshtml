@@ -1,0 +1,65 @@
+﻿@using NhaXeMaiLinh.ViewModels;
+@model RegisterVM
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="row d-flex align-items-center justify-content-center">
+    <div class="col-md-4 card p-3">
+        <h2 class="text-center text-info">Đăng ký</h2>
+        <!-- Google Login Form -->
+        <div class="text-center mb-1">
+            <form asp-action="ExternalLogin" method="post">
+                <button type="submit" name="provider" value="Google" class="btn btn-link btn-floating mx-1">
+                    <i class="fab fa-google"></i>
+                </button>
+            </form>
+        </div>
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-1">
+                <label asp-for="Name" class="control-label">Nhập tên của bạn</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-1">
+                <label asp-for="Email" class="control-label">Nhập email: </label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-1">
+                <label asp-for="Password" class="control-label">Nhập password</label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="mb-1">
+                <label asp-for="ConfirmPassword" class="control-label">Nhập lại mật khẩu</label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="mb-1">
+                <label asp-for="Address" class="control-label">Nhập đia chỉ của bạn</label>
+                <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="row text-center align-items-center justify-content-center">
+                 <div class="col-4">
+                    <input type="submit" value="Đăng ký" class="btn btn-primary btn-sm float-end" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <a asp-action="Login" class="text-decoration-none float-start"> Bạn đã có tài khoản ?  Đăng nhập</a>
+                </div>
+            </div>
+        </form>
+        
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

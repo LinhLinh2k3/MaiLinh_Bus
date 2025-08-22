@@ -1,0 +1,112 @@
+﻿@using System.Globalization
+@model ICollection<NhaXeMaiLinh.Models.Data.VeXe>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Vé xe";
+    Layout = "~/Areas/Staff/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo vé</a>
+    <a asp-action="Check" class="btn btn-primary">Duyệt vé</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Mã vé</th>
+            <th scope="col">Tên khách hàng</th>
+            <th scope="col">Tuyến đường</th>
+            <th scope="col">Khuyến mãi</th>
+            <th scope="col">Tiền vé</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            @foreach (var ve in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => ve.VeID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => ve.KhachHang.HoTen)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => ve.LichTrinh.TuyenDuong.TenTuyenDuong)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => ve.KhuyenMai!.TenKhuyenMai)
+                    </td>
+                    <td>
+                        @string.Format(CultureInfo.InvariantCulture, "{0:N0} đ", ve.TongGiaVe)
+                    </td>
+                    <td class="d-inline-flex">
+                        <a asp-action="Edit" asp-route-id="@ve.VeID">Chỉnh sửa</a><span class="px-2">|</span>
+                        <a asp-action="Details" asp-route-id="@ve.VeID">Chi tiết</a><span class="px-2">|</span>
+                        <form asp-action="Delete" asp-route-id="@ve.VeID">
+                            @Html.AntiForgeryToken()
+                            <a href="#" id="show_confirm" data-bs-toggle="modal" data-bs-target="#delModal" data-title="@ve.VeID">Hủy</a>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7">
+                    <p class="fs-3 fw-bold text-center">Không có dữ liệu :(</p>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Modal -->
+<div class="modal fade" id="delModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Cảnh báo!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center fs-4 fw-bold mbodyTitle">Bạn có chắc hủy vé này không?</p>
+                <p class="text-center fs-5 font-monospace mbodyContent"></p>
+                <p class="text-center fs-6 fst-italic mbodyFooter">Bạn sẽ không hoàn tác lại được!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-confirm">Có</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('a#show_confirm').click(function(event) {
+            var form = $(this).closest("form");
+            var name = $(this).data('title');
+            event.preventDefault();
+
+            var delModal = document.getElementById("delModal");
+            delModal.style.display = "block";
+
+            var modalBodyContent = delModal.querySelector('.modal-body .mbodyContent');
+            modalBodyContent.textContent = name;
+
+            $('.btn-confirm').click(function(e) {
+                e.preventDefault();
+                try {
+                    form.submit();
+                } catch (err) {
+                    HTMLFormElement.prototype.submit.call(form);
+                }
+            });
+        });
+    </script>
+}
